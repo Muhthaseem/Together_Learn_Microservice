@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Together Learn
 
 This monorepo contains two main apps:
@@ -14,3 +15,6 @@ This monorepo contains two main apps:
 
 - **Backend**: `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN`, optional `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - **Frontend**: `NEXT_PUBLIC_API_URL`
+=======
+# Together_Learn_Microservice
+>>>>>>> 78440cf9a38727982ac4046ee8e6b7970bb99ee9
