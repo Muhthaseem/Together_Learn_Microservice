@@ -1,0 +1,58 @@
+# Monolith reference backend (will be replaced by Spring Boot microservices)
+backend/
+
+# Dependencies
+**/node_modules/
+
+# Environment files — never commit secrets
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Next.js
+**/.next/
+**/out/
+
+# Build artifacts
+**/dist/
+**/build/
+**/target/
+**/*.jar
+**/*.war
+**/*.ear
+**/*.class
+
+# TypeScript
+**/*.tsbuildinfo
+**/next-env.d.ts
+
+# Uploads directory
+**/uploads/
+
+# Java / Maven
+*.iml
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# H2 database files
+*.db
+*.mv.db
+*.trace.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.suo
+*.user
