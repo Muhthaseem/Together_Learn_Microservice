@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root{
+  /* Brand palette (light) */
+  --color-primary: #1B4079; /* Yale Blue */
+  --color-primary-hover: #163562;
+  --color-secondary: #4D7C8A; /* Air Force Blue */
+  --color-secondary-hover: #416a76;
+  --color-accent: #7F9C96; /* Cambridge Blue */
+  --color-success: #8FAD88; /* Cambridge Green */
+  --color-highlight: #CBDF90; /* Mindaro */
+
+  /* Surfaces and text */
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-fg: #0A0A0A;
+  --color-muted: #6B7280;
+  --color-on-primary: #FFFFFF;
+
+  /* Spacing + radius */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --radius: 0.5rem;
+}
+
+.dark:root{
+  /* Dark Mode - higher contrast, modern blue/indigo scale */
+  --color-primary: #93C5FD; /* light blue accent */
+  --color-primary-hover: #7DB2F8;
+  --color-secondary: #A78BFA; /* soft indigo */
+  --color-secondary-hover: #8F74F2;
+  --color-accent: #22D3EE; /* cyan accent for highlights */
+  --color-success: #34D399; /* emerald */
+  --color-highlight: #F59E0B; /* amber for notices */
+
+  /* Surfaces */
+  --color-bg: #0B1020;           /* page background */
+  --color-surface: #141A2A;      /* cards/nav */
+  --color-border: #2A3145;       /* borders/dividers */
+  --color-fg: #E5E7EB;           /* primary text */
+  --color-muted: #9CA3AF;        /* secondary text */
+  --color-on-primary: #0B1020;   /* text on buttons */
+}
+
+body{ background: var(--color-bg); color: var(--color-fg); }
+
+/* Utilities driven by tokens */
+.surface{ background: var(--color-surface); }
+.border-token{ border-color: var(--color-border) !important; }
+.text-muted{ color: var(--color-muted); }
+
+/* Links: no underline globally */
+a{ text-decoration: none; }
+a:hover{ text-decoration: none; }
+
+/* Nav pill activate animation */
+@keyframes pill-activate {
+  0% { transform: scale(0.96); opacity: 0.6; filter: saturate(0.7); }
+  100% { transform: scale(1); opacity: 1; filter: saturate(1); }
+}
+.animate-pill { animation: pill-activate 220ms ease-out both; }
