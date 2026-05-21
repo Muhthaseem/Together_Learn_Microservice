@@ -158,7 +158,7 @@ export default function GroupsPage() {
         const up = await uploadApi.upload(filesToUpload);
         attachments = up.files.map(f => f.url);
       }
-      await groupsApi.messages.create(detail.groupId, { text: msgText.trim() || undefined, attachments: attachments.length ? attachments : undefined });
+      await groupsApi.messages.create(detail.groupId, { text: msgText.trim() || undefined, attachmentUrl: attachments.length ? attachments[0] : undefined });
       setMsgText("");
       if (fileRef.current) fileRef.current.value = "";
       // cleanup previews

@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import dynamic from "next/dynamic";
-import { ChevronDownIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon, Bars3Icon, HomeIcon, ChatBubbleLeftRightIcon, UserGroupIcon, AcademicCapIcon, BellIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon, Bars3Icon, HomeIcon, ChatBubbleLeftRightIcon, UserGroupIcon, AcademicCapIcon, BellIcon, ShieldCheckIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { notificationsApi } from "@/lib/api";
 
@@ -39,8 +39,8 @@ export function NavBar() {
     let mounted = true;
     async function load() {
       try {
-        const res = await notificationsApi.list({ page: 1, limit: 1, unread: true });
-        if (mounted) setUnread(res.total || 0);
+        const count = await notificationsApi.unreadCount();
+        if (mounted) setUnread(count);
       } catch {/* ignore */}
     }
     load();
@@ -76,6 +76,18 @@ export function NavBar() {
             </Link>
           );
         })}
+        {user?.role === 'ADMIN' && (
+          <Link
+            href="/dashboard/admin"
+            aria-current={pathname?.startsWith('/dashboard/admin') ? 'page' : undefined}
+            className={`px-3 py-1.5 rounded-full transition-colors inline-flex items-center gap-2 relative ${pathname?.startsWith('/dashboard/admin')
+              ? "bg-[var(--color-primary)]/90 text-[var(--color-on-primary)] shadow-sm backdrop-blur animate-pill"
+              : "text-muted hover:text-[var(--color-primary)] hover:bg-[var(--color-accent)]/15"}`}
+          >
+            <ShieldCheckIcon className="h-4 w-4" />
+            <span className="hidden md:inline">Admin</span>
+          </Link>
+        )}
       </nav>
       <div className="flex items-center gap-2 flex-shrink-0">
         {/* Desktop: show controls separately */}
@@ -183,6 +195,12 @@ export function NavBar() {
             <BellIcon className="h-5 w-5 text-[var(--color-secondary)]" />
             <span>Notifications</span>
           </Link>
+          {user?.role === 'ADMIN' && (
+            <Link href="/dashboard/admin" onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2 ${pathname?.startsWith('/dashboard/admin') ? 'bg-[var(--color-accent)]/20' : 'hover:bg-[var(--color-accent)]/10'}`}>
+              <ShieldCheckIcon className="h-5 w-5 text-[var(--color-secondary)]" />
+              <span>Admin</span>
+            </Link>
+          )}
         </div>
       </div>
     )}
