@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/Button";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 const schema = z.object({
-  email: z.string().email(),
+  email: z.string().min(1, "Username or email is required"),
   password: z.string().min(6),
 });
 
@@ -41,7 +41,7 @@ export default function LoginPage() {
     try {
       const res = await authApi.login(values);
       localStorage.setItem("tl_token", res.token);
-      login(res.user);
+      login({ ...res.user, role: res.user.role });
       toast.success("Logged in");
       window.location.href = "/dashboard";
     } catch {
@@ -61,8 +61,8 @@ export default function LoginPage() {
         <p className="text-sm text-muted mb-4 text-center">Welcome back. Please log in to continue.</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <Input placeholder="Email" {...register("email")} />
+            <label className="block text-sm font-medium mb-1">Username / Email</label>
+            <Input placeholder="Username or email" {...register("email")} />
           </div>
           {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
           <div>
