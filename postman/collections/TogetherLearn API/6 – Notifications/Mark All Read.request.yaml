@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base}}/notifications/read-all"
+method: PUT
+headers:
+  Authorization: Bearer {{token}}
+order: 3000

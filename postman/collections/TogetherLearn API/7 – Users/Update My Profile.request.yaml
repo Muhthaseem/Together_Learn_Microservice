@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base}}/users/{{userId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "name": "Test Student Updated",
+      "department": "CO",
+      "batch": "Batch 5"
+    }
+order: 2000
