@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{base}}/peer-offers"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "courseCode": "CO3040",
+      "description": "I offer tutoring sessions on distributed systems, Raft, and Paxos."
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 201', () => pm.response.to.have.status(201));
+      const r = pm.response.json();
+      pm.test('Has offerId', () => pm.expect(r.offerId).to.be.a('string'));
+      pm.collectionVariables.set('offerId', r.offerId);
+    language: text/javascript
+order: 4000

@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{base}}/groups"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "title": "CO3040 Study Session",
+      "description": "Weekly revision of distributed systems concepts",
+      "courseCode": "CO3040",
+      "scheduledDate": "2026-05-20",
+      "scheduledTime": "14:00:00",
+      "location": "Library Room 3",
+      "mode": "PHYSICAL",
+      "maxParticipants": 10
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 201', () => pm.response.to.have.status(201));
+      const r = pm.response.json();
+      pm.test('Has groupId', () => pm.expect(r.groupId).to.be.a('string'));
+      pm.collectionVariables.set('groupId', r.groupId);
+    language: text/javascript
+order: 1000

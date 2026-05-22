@@ -1,0 +1,11 @@
+$kind: collection
+description: Complete API test suite for TogetherLearn microservices via the API Gateway (port 8080).
+variables:
+  base: http://localhost:8080/api
+  token: ""
+  userId: ""
+  groupId: ""
+  questionId: ""
+  answerId: ""
+  requestId: ""
+  offerId: ""

@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{base}}/questions?courseCode=CO3040"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+queryParams:
+  courseCode: CO3040
+order: 6000
