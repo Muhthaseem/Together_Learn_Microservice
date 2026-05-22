@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+---
+# Install via Helm (run once during cluster setup):
+#   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+#   helm repo update
+#   helm install ingress-nginx ingress-nginx/ingress-nginx \
+#     --namespace ingress-nginx \
+#     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+#
+# After install, get the external IP:
+#   kubectl get svc ingress-nginx-controller -n ingress-nginx
+#   (Use this IP for your DNS A records)
