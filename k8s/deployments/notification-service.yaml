@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: togetherlearn
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: togetherlearn/notification-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086
+          envFrom:
+            - configMapRef:
+                name: tl-config
+          env:
+            - name: DB_URL
+              value: jdbc:postgresql://postgres-notification:5432/notification_db
+            - name: DB_USER
+              value: postgres
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: db-password
+            - name: RABBITMQ_URI
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: rabbitmq-uri
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: redis-url
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8086
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8086
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 250m
+            limits:
+              memory: 1Gi
+              cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: togetherlearn
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 8086
+      targetPort: 8086
