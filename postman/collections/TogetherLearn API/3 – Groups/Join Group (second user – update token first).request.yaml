@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{base}}/groups/{{groupId}}/join"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: "{}"
+order: 4000

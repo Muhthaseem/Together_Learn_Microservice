@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base}}/peer-requests/{{requestId}}/apply"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "message": "I can help! I scored A+ in this module."
+    }
+order: 3000

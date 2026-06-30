@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{base}}/questions"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "title": "What is the CAP theorem?",
+      "body": "Can someone explain Consistency, Availability, and Partition Tolerance in distributed systems?",
+      "courseCode": "CO3040",
+      "tags": "distributed-systems,cap-theorem"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 201', () => pm.response.to.have.status(201));
+      const r = pm.response.json();
+      pm.test('Has questionId', () => pm.expect(r.questionId).to.be.a('string'));
+      pm.collectionVariables.set('questionId', r.questionId);
+    language: text/javascript
+order: 1000

@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{base}}/peer-requests"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "courseCode": "CO3040",
+      "topic": "Need help understanding Raft consensus algorithm",
+      "description": "I'm struggling with the leader election process in Raft. Looking for a tutor."
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 201', () => pm.response.to.have.status(201));
+      const r = pm.response.json();
+      pm.test('Has requestId', () => pm.expect(r.requestId).to.be.a('string'));
+      pm.collectionVariables.set('requestId', r.requestId);
+    language: text/javascript
+order: 1000

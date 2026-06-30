@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base}}/courses"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      pm.test('Is array', () => pm.expect(pm.response.json()).to.be.an('array'));
+      const courses = pm.response.json();
+      pm.test('Has courses', () => pm.expect(courses.length).to.be.above(0));
+    language: text/javascript
+order: 3000

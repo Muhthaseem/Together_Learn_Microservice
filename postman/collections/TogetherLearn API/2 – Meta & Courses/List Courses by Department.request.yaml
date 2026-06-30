@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base}}/courses?department=CO"
+method: GET
+queryParams:
+  department: CO
+order: 4000
