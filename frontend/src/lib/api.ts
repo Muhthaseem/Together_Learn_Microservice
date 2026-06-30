@@ -108,16 +108,17 @@ function fromSpringPage<T, R>(
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
-export type AuthUser = { userId: string; name: string; department: string; batch: string; role?: string; courses: string[]; avatarUrl?: string };
+export type UserRole = 'ADMIN' | 'STUDENT';
+export type AuthUser = { userId: string; name: string; department: string; batch: string; role?: UserRole; courses: string[]; avatarUrl?: string };
 
 export const authApi = {
   register: async (payload: { name: string; email: string; password: string; department: string; batch: string; registrationNumber: string; indexNumber: string }) => {
     const flat = await apiPost<{ userId: string; name: string; email: string; department: string; batch: string; role: string; token: string }>(`/auth/register`, payload);
-    return { token: flat.token, user: { userId: flat.userId, name: flat.name, department: flat.department, batch: flat.batch, role: flat.role, courses: [] as string[] } as AuthUser };
+    return { token: flat.token, user: { userId: flat.userId, name: flat.name, department: flat.department, batch: flat.batch, role: flat.role === 'ADMIN' ? 'ADMIN' : 'STUDENT', courses: [] as string[] } as AuthUser };
   },
   login: async (payload: { email: string; password: string }) => {
     const flat = await apiPost<{ userId: string; name: string; email: string; department: string; batch: string; role: string; token: string }>(`/auth/login`, payload);
-    return { token: flat.token, user: { userId: flat.userId, name: flat.name, department: flat.department, batch: flat.batch, role: flat.role, courses: [] as string[] } as AuthUser };
+    return { token: flat.token, user: { userId: flat.userId, name: flat.name, department: flat.department, batch: flat.batch, role: flat.role === 'ADMIN' ? 'ADMIN' : 'STUDENT', courses: [] as string[] } as AuthUser };
   },
   changePassword: (payload: { oldPassword: string; newPassword: string }) =>
     apiPost<{ message: string }>(`/auth/change-password`, payload),
@@ -505,6 +506,8 @@ export const coursesApi = {
   ),
   create: (payload: { courseCode: string; title: string; description?: string; department: string; semester: number; credits?: number; preReqs?: string }) =>
     apiPost<CourseModule>('/courses', payload),
+  update: (courseCode: string, payload: { title?: string; description?: string; department?: string; semester?: number; credits?: number; preReqs?: string }) =>
+    apiPut<CourseModule>(`/courses/${encodeURIComponent(courseCode)}`, payload),
   remove: (courseCode: string) => apiDelete<void>(`/courses/${encodeURIComponent(courseCode)}`),
 };
 
@@ -554,7 +557,7 @@ export const uploadApi = {
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-export type AdminUser = { userId: string; name: string; email: string; department: string; batch: string; role: string; registrationNumber?: string; indexNumber?: string };
+export type AdminUser = { userId: string; name: string; email: string; department: string; batch: string; role: UserRole; registrationNumber?: string; indexNumber?: string };
 
 export const adminApi = {
   listUsers: async (q?: string, page = 0, size = 50) => {
@@ -565,11 +568,13 @@ export const adminApi = {
     const data = await apiGet<any>(`/users?${qs.toString()}`);
     const items: AdminUser[] = (data.content || []).map((u: any) => ({
       userId: u.userId, name: u.name, email: u.email, department: u.department,
-      batch: u.batch, role: u.role, registrationNumber: u.registrationNumber, indexNumber: u.indexNumber,
+      batch: u.batch, role: u.role === 'ADMIN' ? 'ADMIN' : 'STUDENT', registrationNumber: u.registrationNumber, indexNumber: u.indexNumber,
     }));
     return { items, total: data.totalElements || 0, pages: data.totalPages || 1 };
   },
-  updateUserRole: (userId: string, role: 'ADMIN' | 'STUDENT') =>
+  updateUser: (userId: string, payload: { name?: string; department?: string; batch?: string; registrationNumber?: string; indexNumber?: string; role?: UserRole }) =>
+    apiPut<AdminUser>(`/users/${userId}`, payload),
+  updateUserRole: (userId: string, role: UserRole) =>
     apiPut<AdminUser>(`/users/${userId}/role`, { role }),
 };
 

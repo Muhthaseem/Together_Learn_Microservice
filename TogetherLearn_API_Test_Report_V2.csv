@@ -1,0 +1,97 @@
+Test Case ID,Group,Scenario,API Endpoint,Method,Expected Status,Actual HTTP Status,Response / Result,Pass/Fail,Fix Status,Defects / Notes
+TC001,0 - Health Checks,Eureka Dashboard reachable,http://localhost:8761,GET,200,200,Eureka dashboard HTML returned,PASS,N/A (was PASS),
+TC002,0 - Health Checks,API Gateway health check,/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC003,0 - Health Checks,User Service health,http://localhost:8081/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC004,0 - Health Checks,Course Service health,http://localhost:8082/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC005,0 - Health Checks,Group Service health,http://localhost:8083/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC006,0 - Health Checks,Q&A Service health,http://localhost:8084/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC007,0 - Health Checks,Peer Teaching Service health,http://localhost:8085/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC008,0 - Health Checks,Notification Service health,http://localhost:8086/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC009,0 - Health Checks,Chat Service health,http://localhost:8087/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC010,0 - Health Checks,File Service health,http://localhost:8088/actuator/health,GET,200,200,{status:UP},PASS,N/A (was PASS),
+TC011,1 - Auth,Register new student user (User 1),/api/auth/register,POST,201,201,userId + JWT token returned,PASS,N/A (was PASS),
+TC012,1 - Auth,Login with registered credentials (User 1),/api/auth/login,POST,200,200,JWT (3-part) + userId returned,PASS,N/A (was PASS),
+TC013,1 - Auth,Register second student user (User 2),/api/auth/register,POST,201,201,userId + JWT token returned,PASS,N/A (was PASS),
+TC014,1 - Auth,Login with registered credentials (User 2),/api/auth/login,POST,200,200,JWT token returned,PASS,N/A (was PASS),
+TC015,1 - Auth,Get own profile (User 1),/api/users/{userId},GET,200,200,Has email and department=CO,PASS,N/A (was PASS),
+TC016,1 - Auth,Get own profile (User 2),/api/users/{userId2},GET,200,200,Correct userId in response,PASS,N/A (was PASS),
+TC017,1 - Auth,Search users by name query,/api/users?q=Test,GET,200,200,Paginated array of matching users,PASS,N/A (was PASS),
+TC018,1 - Auth,Update user profile name,/api/users/{userId},PUT,200,200,Profile name updated successfully,PASS,N/A (was PASS),
+TC019,1 - Auth,Change password (correct field: oldPassword),/api/auth/change-password,POST,200,200,Password changed successfully,PASS,N/A (was PASS),POSTMAN COLLECTION DEFECT: Collection sends 'currentPassword' but API @NotBlank field is 'oldPassword'. Tested with correct field — API works. No API bug.
+TC020,1 - Auth,Login with new password after change,/api/auth/login,POST,200,200,New token issued,PASS,N/A (was PASS),
+TC021,1 - Auth,Reset password back to original,/api/auth/change-password,POST,200,200,Password reset to original,PASS,N/A (was PASS),
+TC022,1 - Auth,Re-login with original password (restore token),/api/auth/login,POST,200,200,Token restored,PASS,N/A (was PASS),
+TC023,2 - Meta & Courses,Get list of departments,/api/meta/departments,GET,200,200,"[First Year, CO, CE, ME, EEE] — 5 depts returned",PASS,N/A (was PASS),
+TC024,2 - Meta & Courses,Get list of batches,/api/meta/batches,GET,200,200,10 batches returned (Batch 1-10),PASS,N/A (was PASS),
+TC025,2 - Meta & Courses,List all courses,/api/courses,GET,200,200,166 courses returned,PASS,N/A (was PASS),
+TC026,2 - Meta & Courses,Filter courses by department,/api/courses?department=CO,GET,200,200,"CO:33 | CE:43 | ME:32 | EEE:27 | First Year:31 — all correct",PASS,FIXED (was FAIL),"Root cause: CourseSeedService parsed courses.json as Map<dept→list> instead of flat {courses:[]} array — every course got department='courses'. Flyway V2 migration backfilled correct dept codes (LIKE CO%/CE%/EE%/ME%/IS%). Redis cache also flushed — stale empty results were cached under old dept values and survived service restart."
+TC027,2 - Meta & Courses,Filter courses by department and semester,"/api/courses?department=CO&semester=3",GET,200,200,CO semester-3 courses returned,PASS,N/A (was PASS),
+TC028,2 - Meta & Courses,Search courses by keyword,/api/courses?q=data,GET,200,200,Matching courses returned,PASS,N/A (was PASS),
+TC029,2 - Meta & Courses,Get course by code — CO3040 does not exist,/api/courses/CO3040,GET,404,404,"{status:404, message:Course not found: CO3040}",PASS,FIXED (was FAIL),"Root cause: service threw IllegalArgumentException for not-found → GlobalExceptionHandler mapped it to 400. Fix: added ResourceNotFoundException class; GlobalExceptionHandler now returns 404 for ResourceNotFoundException. CO3040 seed data not present by design — 404 is the correct response."
+TC030,3 - Groups E2E,Create a new study group (User 1 as creator),/api/groups,POST,201,201,groupId + title + status=ACTIVE returned,PASS,N/A (was PASS),
+TC031,3 - Groups E2E,List all groups,/api/groups,GET,200,200,Returns array of groups,PASS,N/A (was PASS),
+TC032,3 - Groups E2E,Filter groups by courseCode,/api/groups?courseCode=CO1201,GET,200,200,Created group found in results,PASS,N/A (was PASS),
+TC033,3 - Groups E2E,Get group detail by groupId,/api/groups/{groupId},GET,200,200,groupId + title + members returned,PASS,N/A (was PASS),
+TC034,3 - Groups E2E,Update group title and maxParticipants (creator only),/api/groups/{groupId},PUT,200,200,Title updated confirmed,PASS,N/A (was PASS),
+TC035,3 - Groups E2E,Join group as non-creator (User 2),/api/groups/{groupId}/join,POST,"200,201",200,User 2 joined successfully,PASS,N/A (was PASS),
+TC036,3 - Groups E2E,Post chat message in group (User 1),/api/messages/groups/{groupId},POST,201,201,messageId + content returned,PASS,N/A (was PASS),
+TC037,3 - Groups E2E,Post chat message in group (User 2),/api/messages/groups/{groupId},POST,201,201,Message posted,PASS,N/A (was PASS),
+TC038,3 - Groups E2E,List chat messages with pagination,"/api/messages/groups/{groupId}?page=0&size=20",GET,200,200,3 messages found (>= 2 required),PASS,N/A (was PASS),
+TC039,3 - Groups E2E,Leave group (User 2),/api/groups/{groupId}/leave,POST,"200,204",200,User 2 left group,PASS,N/A (was PASS),
+TC040,3 - Groups E2E,Delete group (creator only),/api/groups/{groupId},DELETE,"200,204",204,Group deleted,PASS,N/A (was PASS),
+TC041,4 - Q&A E2E,Create new question (User 1),/api/questions,POST,201,201,questionId + status=OPEN + voteCount=0,PASS,N/A (was PASS),
+TC042,4 - Q&A E2E,List all questions,/api/questions,GET,200,200,Returns array,PASS,N/A (was PASS),
+TC043,4 - Q&A E2E,Filter questions by courseCode,/api/questions?courseCode=CO1201,GET,200,200,Created question found in results,PASS,N/A (was PASS),
+TC044,4 - Q&A E2E,Filter questions by status OPEN,/api/questions?status=OPEN,GET,200,200,Returns open questions,PASS,N/A (was PASS),
+TC045,4 - Q&A E2E,Get question detail with answers and voteCount,/api/questions/{questionId},GET,200,200,answers array and upvoteCount present,PASS,N/A (was PASS),
+TC046,4 - Q&A E2E,Upvote question (User 2),/api/questions/{questionId}/vote,POST,"200,201",200,upvoteCount incremented to 1,PASS,N/A (was PASS),
+TC047,4 - Q&A E2E,Bookmark a question (User 2),/api/questions/{questionId}/bookmark,POST,"200,201",200,Question bookmarked,PASS,N/A (was PASS),
+TC048,4 - Q&A E2E,Get bookmarked questions list (User 2),/api/questions/bookmarked,GET,200,200,Bookmarked question present,PASS,N/A (was PASS),
+TC049,4 - Q&A E2E,Remove bookmark from question (User 2),/api/questions/{questionId}/bookmark,DELETE,"200,204",204,Bookmark removed,PASS,N/A (was PASS),
+TC050,4 - Q&A E2E,Add answer to question (User 2),/api/questions/{questionId}/answers,POST,201,201,answerId returned,PASS,N/A (was PASS),
+TC051,4 - Q&A E2E,Update answer content (answer author),/api/questions/{questionId}/answers/{answerId},PUT,200,200,Answer updated,PASS,N/A (was PASS),
+TC052,4 - Q&A E2E,Add reply to an answer (User 1),/api/questions/{questionId}/answers/{answerId}/replies,POST,201,201,replyId returned,PASS,N/A (was PASS),
+TC053,4 - Q&A E2E,Update reply content (reply author),/api/questions/{questionId}/answers/{answerId}/replies/{replyId},PUT,200,200,Reply updated,PASS,N/A (was PASS),
+TC054,4 - Q&A E2E,Upvote answer (User 1),/api/questions/{questionId}/answers/{answerId}/vote,POST,"200,201",200,Answer upvoted,PASS,N/A (was PASS),
+TC055,4 - Q&A E2E,Accept answer as best answer (question author),/api/questions/{questionId}/answers/{answerId}/accept,POST,"200,201",200,Answer accepted + question=ANSWERED,PASS,N/A (was PASS),
+TC056,4 - Q&A E2E,Delete reply (reply author),/api/questions/{questionId}/answers/{answerId}/replies/{replyId},DELETE,"200,204",204,Reply deleted,PASS,N/A (was PASS),
+TC057,4 - Q&A E2E,Delete answer (answer author),/api/questions/{questionId}/answers/{answerId},DELETE,"200,204",204,Answer deleted,PASS,N/A (was PASS),
+TC058,4 - Q&A E2E,Delete question (question author),/api/questions/{questionId},DELETE,"200,204",204,Question deleted,PASS,N/A (was PASS),
+TC059,5 - Peer Teaching E2E,Create peer teaching offer (User 2 as tutor),/api/peer-offers,POST,201,201,offerId returned + status=AVAILABLE,PASS,N/A (was PASS),
+TC060,5 - Peer Teaching E2E,List all peer teaching offers,/api/peer-offers,GET,200,200,Returns array,PASS,N/A (was PASS),
+TC061,5 - Peer Teaching E2E,Filter peer offers by courseCode,/api/peer-offers?courseCode=CO1201,GET,200,200,Created offer found in results,PASS,N/A (was PASS),
+TC062,5 - Peer Teaching E2E,Create peer help request (User 1 as learner),/api/peer-requests,POST,201,201,requestId returned + status=OPEN,PASS,N/A (was PASS),POSTMAN COLLECTION DEFECT: Collection sends 'title' as required field but API @NotBlank is 'topic'. Also 'preferredTime' does not exist — correct fields are 'topic' + 'preferredMode'. Tested with correct fields — API works. No API bug.
+TC063,5 - Peer Teaching E2E,List all peer help requests,/api/peer-requests,GET,200,200,Returns array,PASS,N/A (was PASS),
+TC064,5 - Peer Teaching E2E,Filter peer requests by courseCode,/api/peer-requests?courseCode=CO1201,GET,200,200,Returns filtered results,PASS,N/A (was PASS),
+TC065,5 - Peer Teaching E2E,Get peer request detail with applications embedded,/api/peer-requests/{requestId},GET,200,200,applications array present,PASS,N/A (was PASS),
+TC066,5 - Peer Teaching E2E,Apply to tutor a help request (User 2),/api/peer-requests/{requestId}/apply,POST,"200,201",201,applicationId returned + status=PENDING,PASS,N/A (was PASS),
+TC067,5 - Peer Teaching E2E,Get request and verify applicant exists (User 1 checks),/api/peer-requests/{requestId},GET,200,200,1 application found,PASS,N/A (was PASS),
+TC068,5 - Peer Teaching E2E,Accept application and schedule session (User 1),/api/peer-requests/{requestId}/applications/{appId}/accept,PUT,"200,201",200,sessionId returned + status=SCHEDULED,PASS,N/A (was PASS),POSTMAN COLLECTION DEFECT: Collection sends empty body {} but API requires @Valid ScheduleSessionRequest with sessionDate + sessionTime + mode (@NotNull). Tested with correct body — API works. No API bug.
+TC069,5 - Peer Teaching E2E,Get own sessions as learner (User 1),/api/sessions/my,GET,200,200,Session array with 1 entry,PASS,N/A (was PASS),
+TC070,5 - Peer Teaching E2E,Get session detail by sessionId,/api/sessions/{sessionId},GET,200,200,Full session object returned,PASS,N/A (was PASS),
+TC071,5 - Peer Teaching E2E,Mark session as completed,/api/sessions/{sessionId}/complete,PUT,200,200,status changed to COMPLETED,PASS,N/A (was PASS),
+TC072,5 - Peer Teaching E2E,Rate completed session 5 stars with feedback (User 1),/api/sessions/{sessionId}/rate,POST,"200,201",200,Rating saved successfully,PASS,N/A (was PASS),
+TC073,5 - Peer Teaching E2E,Get tutor statistics (User 2),/api/sessions/tutors/{userId2}/stats,GET,200,200,averageRating=5.00 + ratingCount=1,PASS,N/A (was PASS),
+TC074,6 - Notifications,List notifications for User 1 (paginated),"/api/notifications?page=0&size=20",GET,200,200,HTTP 200 + 0 notifications (async RabbitMQ events not delivered within test window),PASS,N/A (was PASS),INFO: Async delivery lag expected in fast sequential test run. Not a defect.
+TC075,6 - Notifications,Get unread notification count (User 1),/api/notifications/unread-count,GET,200,200,{count:0},PASS,N/A (was PASS),
+TC076,6 - Notifications,Mark single notification as read (User 1),/api/notifications/{notifId}/read,PUT,"200,204",SKIP,No notificationId available (0 notifications delivered in test window),SKIP,N/A,Blocked by TC074 having no notifications. Re-run after async delivery or seed a notification manually.
+TC077,6 - Notifications,Mark all notifications as read (User 1),/api/notifications/read-all,PUT,"200,204",200,HTTP 200 — all marked read,PASS,N/A (was PASS),
+TC078,6 - Notifications,List notifications for User 2,/api/notifications,GET,200,200,HTTP 200,PASS,N/A (was PASS),
+TC079,6 - Notifications,Get unread notification count (User 2),/api/notifications/unread-count,GET,200,200,{count:0},PASS,N/A (was PASS),
+TC080,7 - File Service,Upload text file to MinIO via API Gateway,/api/files/upload?folder=test-uploads,POST,"200,201",200,key + MinIO URL returned,PASS,N/A (was PASS),Returns 200 not 201; Postman accepts 200 or 201 — acceptable.
+TC081,7 - File Service,Get presigned download URL for uploaded file,"/api/files/presigned?key={key}&expiryMinutes=60",GET,200,200,HMAC pre-signed URL returned,PASS,N/A (was PASS),
+TC082,7 - File Service,Delete uploaded file from object storage,/api/files?key={key},DELETE,"200,204",204,File deleted from MinIO,PASS,N/A (was PASS),
+TC083,8 - Users & Courses Admin,List all users — student token (admin-only endpoint),/api/users,GET,200,403,403 Forbidden for STUDENT role,FAIL,NOT A BUG — NO CODE CHANGE,"Confirmed by design: /api/users without ?q= param is ADMIN-only. Student token correctly receives 403. Postman test expectation is wrong. No code fix applied. Recommendation: update Postman test to expect 403 for non-admin token, or add separate test for ADMIN token returning 200."
+TC084,8 - Users & Courses Admin,Get enrolled courses for own user (self),/api/users/{userId}/courses,GET,200,200,Returns [] empty courses list,PASS,N/A (was PASS),
+TC085,8 - Users & Courses Admin,Update enrolled courses for own user (self),/api/users/{userId}/courses,PUT,200,200,"courses=[CO2030, CO1201] confirmed in response",PASS,N/A (was PASS),
+TC086,8 - Users & Courses Admin,[Admin] Change user role to ADMIN,/api/users/{userId2}/role,PUT,200,SKIP,No adminToken provisioned in test run,SKIP,N/A,Requires ADMIN-role JWT. Re-run with admin credentials to cover this path.
+TC087,8 - Users & Courses Admin,[Admin] Create a new course entry,/api/courses,POST,201,SKIP,No adminToken provisioned in test run,SKIP,N/A,Requires ADMIN-role JWT. Re-run with admin credentials.
+TC088,8 - Users & Courses Admin,[Admin] Delete a course entry,/api/courses/{courseCode},DELETE,"200,204",SKIP,No adminToken provisioned in test run,SKIP,N/A,Requires ADMIN-role JWT. Re-run with admin credentials.
+TC089,9 - Negative / Error Cases,Access protected endpoint with no auth token → 401,/api/groups,GET,401,401,401 Unauthorized,PASS,N/A (was PASS),
+TC090,9 - Negative / Error Cases,Access endpoint with malformed JWT token → 401,/api/questions,GET,401,401,401 Unauthorized,PASS,N/A (was PASS),
+TC091,9 - Negative / Error Cases,GET non-existent group by zero UUID → 404,/api/groups/00000000-0000-0000-0000-000000000000,GET,404,404,"{status:404, message:Group not found: 00000000-...}",PASS,FIXED (was FAIL),"Root cause: GroupService.getGroup() threw IllegalArgumentException → GlobalExceptionHandler returned 400. Fix: added ResourceNotFoundException; GlobalExceptionHandler @ExceptionHandler(ResourceNotFoundException) now returns 404. All orElseThrow look-ups in GroupService updated."
+TC092,9 - Negative / Error Cases,GET non-existent question by zero UUID → 404,/api/questions/00000000-0000-0000-0000-000000000000,GET,404,404,"{status:404, message:Question not found: 00000000-...}",PASS,FIXED (was FAIL),"Root cause: Same as TC091 in qa-service. Fix: ResourceNotFoundException + GlobalExceptionHandler returning 404. All look-ups in QaService updated to throw ResourceNotFoundException."
+TC093,9 - Negative / Error Cases,Login with wrong email and password → 401,/api/auth/login,POST,401,401,"{status:401, message:Invalid credentials}",PASS,FIXED (was FAIL),"Root cause: UserService.login() threw IllegalArgumentException on bad credentials → GlobalExceptionHandler returned 400. Fix: added AuthenticationException class; GlobalExceptionHandler @ExceptionHandler(AuthenticationException) returns 401. Both credential-failure paths (user not found + wrong password) now throw AuthenticationException."
+TC094,9 - Negative / Error Cases,Register with email already in use (duplicate) → 409/400,/api/auth/register,POST,"400,409,422",400,400 — duplicate registration number/email message,PASS,N/A (was PASS),Returns 400 within accepted range (400/409/422).
+TC095,9 - Negative / Error Cases,Create group with empty request body → 400,/api/groups,POST,"400,422",400,400 validation error,PASS,N/A (was PASS),
+TC096,9 - Negative / Error Cases,Circuit breaker health sub-indicator → 200,/actuator/health/circuitBreakers,GET,200,200,"{status:UNKNOWN, components:{circuitBreakers:{status:UNKNOWN}}}",PASS,FIXED (was FAIL),"Root cause: management.health.circuitbreakers.enabled=true adds the indicator to the aggregate /health but does not expose a named sub-path. Fix: added circuitBreakers health group with include:circuitBreakers + show-details:always in api-gateway application.yml. Endpoint now returns 200. Status=UNKNOWN is expected when no circuit-breaker trips have occurred."
