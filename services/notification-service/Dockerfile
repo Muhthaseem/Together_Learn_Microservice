@@ -1,4 +1,4 @@
-FROM maven:3.9.6-eclipse-temurin-25-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /workspace
 
 COPY pom.xml .
@@ -6,12 +6,12 @@ RUN mvn -B install -N -q
 
 WORKDIR /workspace/notification-service
 COPY notification-service/pom.xml .
-RUN mvn -B dependency:resolve -q
+RUN mvn -B dependency:go-offline -q
 
 COPY notification-service/src ./src
 RUN mvn -B package -DskipTests -q
 
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /workspace/notification-service/target/*.jar app.jar
 EXPOSE 8086

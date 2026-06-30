@@ -6,7 +6,7 @@ RUN mvn -B install -N -q
 
 WORKDIR /workspace/group-service
 COPY group-service/pom.xml .
-RUN mvn -B dependency:resolve -q
+RUN mvn -B dependency:go-offline -q
 
 COPY group-service/src ./src
 RUN mvn -B package -DskipTests -q
