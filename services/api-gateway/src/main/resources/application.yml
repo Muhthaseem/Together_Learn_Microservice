@@ -1,0 +1,200 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  data:
+    redis:
+      url: ${REDIS_URL:redis://:redis_pass@localhost:6379}
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "http://localhost:3000"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+      routes:
+        # Auth routes — public, no JWT filter applied (JwtAuthFilter skips these paths)
+        - id: user-auth
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userServiceCB
+                fallbackUri: forward:/fallback/user-service
+
+        # User profile routes
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userServiceCB
+                fallbackUri: forward:/fallback/user-service
+
+        # Course and metadata routes
+        - id: course-service
+          uri: lb://COURSE-SERVICE
+          predicates:
+            - Path=/api/courses/**, /api/meta/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: courseServiceCB
+                fallbackUri: forward:/fallback/course-service
+
+        # Study groups
+        - id: group-service
+          uri: lb://GROUP-STUDY-SERVICE
+          predicates:
+            - Path=/api/groups/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: groupServiceCB
+                fallbackUri: forward:/fallback/group-service
+
+        # Q&A forum
+        - id: qa-service
+          uri: lb://QA-SERVICE
+          predicates:
+            - Path=/api/questions/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: qaServiceCB
+                fallbackUri: forward:/fallback/qa-service
+
+        # Peer teaching requests and offers
+        - id: peer-teaching-service
+          uri: lb://PEER-TEACHING-SERVICE
+          predicates:
+            - Path=/api/peer-requests/**, /api/peer-offers/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: peerServiceCB
+                fallbackUri: forward:/fallback/peer-teaching-service
+
+        # Tutoring sessions (also served by peer-teaching-service)
+        - id: peer-sessions
+          uri: lb://PEER-TEACHING-SERVICE
+          predicates:
+            - Path=/api/sessions/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: peerServiceCB
+                fallbackUri: forward:/fallback/peer-teaching-service
+
+        # Notifications
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: notificationServiceCB
+                fallbackUri: forward:/fallback/notification-service
+
+        # File storage (upload / download)
+        - id: file-service
+          uri: lb://FILE-SERVICE
+          predicates:
+            - Path=/api/files/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: fileServiceCB
+                fallbackUri: forward:/fallback/file-service
+
+        # Chat WebSocket (STOMP over SockJS) — no circuit breaker; CBs don't suit long-lived WS connections
+        - id: chat-ws
+          uri: lb:ws://CHAT-SERVICE
+          predicates:
+            - Path=/ws/**
+
+        # Chat messages (REST — history fetch)
+        - id: chat-service
+          uri: lb://CHAT-SERVICE
+          predicates:
+            - Path=/api/messages/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: chatServiceCB
+                fallbackUri: forward:/fallback/chat-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:default-secret-change-in-production-min-32-chars}
+
+# ── Resilience4j circuit breaker configuration ────────────────────────────────
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10                # evaluate the last 10 calls
+        failure-rate-threshold: 50             # open circuit if ≥50% of calls fail
+        wait-duration-in-open-state: 30s       # stay OPEN for 30 s before moving to HALF-OPEN
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.cloud.gateway.support.NotFoundException
+    instances:
+      userServiceCB:
+        base-config: default
+      courseServiceCB:
+        base-config: default
+      groupServiceCB:
+        base-config: default
+      qaServiceCB:
+        base-config: default
+      peerServiceCB:
+        base-config: default
+      notificationServiceCB:
+        base-config: default
+      fileServiceCB:
+        base-config: default
+      chatServiceCB:
+        base-config: default
+
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s   # upstream calls that take >10 s count as failures
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, gateway, circuitbreakers
+  health:
+    circuitbreakers:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
