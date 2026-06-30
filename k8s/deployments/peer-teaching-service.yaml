@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peer-teaching-service
+  namespace: togetherlearn
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: peer-teaching-service
+  template:
+    metadata:
+      labels:
+        app: peer-teaching-service
+    spec:
+      containers:
+        - name: peer-teaching-service
+          image: togetherlearn/peer-teaching-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: tl-config
+          env:
+            - name: DB_URL
+              value: jdbc:postgresql://postgres-peer:5432/peer_db
+            - name: DB_USER
+              value: postgres
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: db-password
+            - name: RABBITMQ_URI
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: rabbitmq-uri
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8085
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 250m
+            limits:
+              memory: 1Gi
+              cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: peer-teaching-service
+  namespace: togetherlearn
+spec:
+  selector:
+    app: peer-teaching-service
+  ports:
+    - port: 8085
+      targetPort: 8085
