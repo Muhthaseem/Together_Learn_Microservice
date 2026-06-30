@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base}}/notifications/unread-count"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      pm.test('Has count', () => pm.expect(pm.response.json().count).to.be.a('number'));
+    language: text/javascript
+order: 2000
