@@ -28,10 +28,12 @@ export default function QuestionsPage() {
   const [data, setData] = useState<{ items: any[]; page: number; pages: number } | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [courseOptions, setCourseOptions] = useState<string[]>([]);
   const [sortOpen, setSortOpen] = useState(false);
   const [sort, setSort] = useState<string>("-createdAt");
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting }, setValue } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -61,6 +63,21 @@ export default function QuestionsPage() {
   const courseModule = watch("courseModule");
 
   useEffect(() => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [courseModule]);
+
+  useEffect(() => {
     (async () => {
       try {
         const all = await coursesApi.list();
@@ -77,10 +94,10 @@ export default function QuestionsPage() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, courseModule, search, sort]);
+  }, [page, courseModule, debouncedSearch, sort]);
 
   async function load() {
-    const res = await questionsApi.list({ courseModule: courseModule || undefined, q: search || undefined, page, limit: 5, sort }).catch(() => null);
+    const res = await questionsApi.list({ courseModule: courseModule || undefined, q: debouncedSearch || undefined, page, limit: 5, sort }).catch(() => null);
     if (res) setData(res);
   }
 
@@ -159,7 +176,13 @@ export default function QuestionsPage() {
                     <div className="text-xs text-muted mb-1">Search</div>
                     <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search title or description" />
                   </div>
-                  
+                  <div>
+                    <div className="text-xs text-muted mb-1">Sort By</div>
+                    <Select value={sort} onChange={(e) => setSort(e.target.value)}>
+                      <option value="-createdAt">Newest First</option>
+                      <option value="createdAt">Oldest First</option>
+                    </Select>
+                  </div>
                 </div>
               </div>
               </>
@@ -185,6 +208,13 @@ export default function QuestionsPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Search</label>
             <Input className="max-w-xs" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search title or description" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Sort By</label>
+            <Select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <option value="-createdAt">Newest First</option>
+              <option value="createdAt">Oldest First</option>
+            </Select>
           </div>
           <Button className="ml-auto" leftIcon={<PlusIcon className="h-4 w-4" />} onClick={() => setOpen(true)}>Ask Question</Button>
         </div>

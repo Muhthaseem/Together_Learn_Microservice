@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-service
+  namespace: togetherlearn
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: file-service
+  template:
+    metadata:
+      labels:
+        app: file-service
+    spec:
+      containers:
+        - name: file-service
+          image: togetherlearn/file-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: tl-config
+          env:
+            - name: AWS_S3_ENDPOINT
+              value: http://minio:9000
+            - name: AWS_S3_PUBLIC_URL
+              value: https://api.togetherlearn.app/files
+            - name: AWS_S3_BUCKET
+              value: tl-files
+            - name: AWS_REGION
+              value: us-east-1
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: minio-access-key
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tl-secrets
+                  key: minio-secret-key
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8088
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8088
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 250m
+            limits:
+              memory: 1Gi
+              cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: file-service
+  namespace: togetherlearn
+spec:
+  selector:
+    app: file-service
+  ports:
+    - port: 8088
+      targetPort: 8088

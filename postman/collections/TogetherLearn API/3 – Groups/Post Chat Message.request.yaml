@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base}}/messages/groups/{{groupId}}"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "content": "Hello group! Ready for today's session?"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 201', () => pm.response.to.have.status(201));
+      pm.test('Has messageId', () => pm.expect(pm.response.json().messageId).to.be.a('string'));
+    language: text/javascript
+order: 6000

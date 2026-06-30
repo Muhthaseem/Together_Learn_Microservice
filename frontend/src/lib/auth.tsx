@@ -7,6 +7,7 @@ export type UserProfile = {
   department: string;
   batch: string;
   courses: string[];
+  role?: string;
   registrationNumber?: string;
   indexNumber?: string;
   avatarUrl?: string;
@@ -31,8 +32,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (raw) setUser(JSON.parse(raw));
       // Refresh from backend to ensure latest avatar/name
       const token = typeof window !== 'undefined' ? localStorage.getItem('tl_token') : undefined;
-      if (token) {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/users/me`, {
+      const storedUser = typeof window !== 'undefined' ? localStorage.getItem('tl_user') : null;
+      let storedUserId: string | null = null;
+      try { storedUserId = storedUser ? JSON.parse(storedUser).userId : null; } catch {}
+      if (token && storedUserId) {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/users/${storedUserId}`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store',
         }).then(async (r) => {
@@ -44,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             department: me.department,
             batch: me.batch,
             courses: me.courses || [],
+            role: me.role,
             registrationNumber: me.registrationNumber,
             indexNumber: me.indexNumber,
             avatarUrl: me.avatarUrl,
@@ -64,8 +69,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("tl_user", JSON.stringify(profile));
     },
     logout: () => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('tl_token') : null;
+      if (token) {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/auth/logout`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
       setUser(null);
       localStorage.removeItem("tl_user");
+      localStorage.removeItem("tl_token");
     },
     ready,
   }), [user, ready]);

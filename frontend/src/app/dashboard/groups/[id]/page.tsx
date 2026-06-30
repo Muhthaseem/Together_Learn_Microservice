@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { PageContainer, SectionHeader } from "@/components/ui/Page";
 import { UserGroupIcon, MapPinIcon, CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
+import { GroupChat } from "@/components/chat/GroupChat";
 
 export default function GroupDetailPage() {
   const { id } = useParams();
@@ -149,6 +150,14 @@ export default function GroupDetailPage() {
           )}
         </div>
       </div>
+
+      {(isParticipant || isCreator) && (
+        <div className="mt-6">
+          <div className="rounded-lg border border-token surface p-4 shadow-sm">
+            <GroupChat groupId={group.groupId} />
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 }

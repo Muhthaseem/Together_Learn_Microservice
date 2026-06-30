@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{base}}/groups/{{groupId}}/leave"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: "{}"
+order: 5000

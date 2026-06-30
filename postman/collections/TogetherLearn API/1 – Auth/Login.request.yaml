@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{base}}/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "email": "en202001@foe.sjp.ac.lk",
+      "password": "password123"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const r = pm.response.json();
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      pm.test('Has token', () => pm.expect(r.token).to.be.a('string'));
+      pm.test('Has userId', () => pm.expect(r.userId).to.be.a('string'));
+      pm.collectionVariables.set('token', r.token);
+      pm.collectionVariables.set('userId', r.userId);
+    language: text/javascript
+order: 2000

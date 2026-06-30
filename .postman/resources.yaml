@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: ""
+
+localResources:
+  collections:
+    - ..\TogetherLearn.postman_collection.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ..\postman\collections\TogetherLearn API: 7348d9f9-75ce-4890-98d1-a91ef3cf12ed

@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base}}/questions/{{questionId}}/answers"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "content": "The CAP theorem states that a distributed system can only guarantee two of the three: Consistency, Availability, and Partition Tolerance."
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 201', () => pm.response.to.have.status(201));
+      const r = pm.response.json();
+      pm.test('Has answerId', () => pm.expect(r.answerId).to.be.a('string'));
+      pm.collectionVariables.set('answerId', r.answerId);
+    language: text/javascript
+order: 4000
