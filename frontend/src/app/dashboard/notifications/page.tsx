@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { notificationsApi, type NotificationItem } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { EllipsisVerticalIcon, ChatBubbleLeftRightIcon, UserGroupIcon, AcademicCapIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid';
+import { ChatBubbleLeftRightIcon, UserGroupIcon, AcademicCapIcon, ClipboardDocumentCheckIcon, CalendarDaysIcon } from '@heroicons/react/24/solid';
 
 function timeAgo(iso: string) {
   const d = new Date(iso).getTime();
@@ -25,13 +25,13 @@ export default function NotificationsPage() {
   const [pages, setPages] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [onlyUnread, setOnlyUnread] = React.useState(false);
-  const [openMenuId, setOpenMenuId] = React.useState<string | null>(null);
 
   const load = React.useCallback(async (p = 1) => {
     setLoading(true);
     try {
-      const res = await notificationsApi.list({ page: p, limit: 20, unread: onlyUnread });
-      setItems(res.items);
+      const res = await notificationsApi.list({ page: p, limit: 20 });
+      const filtered = onlyUnread ? { ...res, items: res.items.filter(n => !n.read) } : res;
+      setItems(filtered.items);
       setPage(res.page);
       setPages(res.pages);
     } finally {
@@ -49,10 +49,6 @@ export default function NotificationsPage() {
     await notificationsApi.mark(id);
     await load(page);
   }
-  async function remove(id: string) {
-    await notificationsApi.remove(id);
-    await load(page);
-  }
 
   function linkFor(n: NotificationItem): string | null {
     switch (n.type) {
@@ -64,6 +60,8 @@ export default function NotificationsPage() {
       case 'class_join':
       case 'request_accept':
       case 'request_join':
+        return '/dashboard/peer';
+      case 'session_scheduled':
         return '/dashboard/peer';
       default:
         return null;
@@ -91,6 +89,8 @@ export default function NotificationsPage() {
           <AcademicCapIcon className="h-5 w-5 text-[var(--color-secondary)]" />
         ) : n.type === 'request_accept' || n.type === 'request_join' ? (
           <ClipboardDocumentCheckIcon className="h-5 w-5 text-[var(--color-success)]" />
+        ) : n.type === 'session_scheduled' ? (
+          <CalendarDaysIcon className="h-5 w-5 text-[var(--color-primary)]" />
         ) : (
           <ChatBubbleLeftRightIcon className="h-5 w-5 text-[var(--color-secondary)]" />
         )}

@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8761/eureka/apps
+method: GET
+headers:
+  Accept: application/json
+order: 1000

@@ -1,0 +1,54 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: discovery-server
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['discovery-server:8761']
+
+  - job_name: api-gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['api-gateway:8080']
+
+  - job_name: user-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['user-service:8081']
+
+  - job_name: course-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['course-service:8082']
+
+  - job_name: group-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['group-service:8083']
+
+  - job_name: qa-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['qa-service:8084']
+
+  - job_name: peer-teaching-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['peer-teaching-service:8085']
+
+  - job_name: notification-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['notification-service:8086']
+
+  - job_name: chat-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['chat-service:8087']
+
+  - job_name: file-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['file-service:8088']

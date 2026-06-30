@@ -1,0 +1,1402 @@
+{
+    "courses": [
+      {
+        "code": "CE1201",
+        "title": "Properties of Materials",
+        "semester": "1",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CO1201",
+        "title": "Introduction to Computer System",
+        "semester": "1",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "EE1201",
+        "title": "Electricity",
+        "semester": "1",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME1301",
+        "title": "Engineering Mechanics",
+        "semester": "1",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME1202",
+        "title": "Introduction to Thermodynamics",
+        "semester": "1",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "IS1301",
+        "title": "Engineering Mathematics I",
+        "semester": "1",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS1151",
+        "title": "English for Communication",
+        "semester": "1",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS1171",
+        "title": "History of Science and Technology",
+        "semester": "1",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS1281",
+        "title": "Engineering Measurement",
+        "semester": "1",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CE1202",
+        "title": "Introduction to Fluid Mechanics",
+        "semester": "2",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CO1302",
+        "title": "Programming for Engineers",
+        "semester": "2",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "EE1302",
+        "title": "Electronics",
+        "semester": "2",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME1303",
+        "title": "Basic Manufacturing Processes",
+        "semester": "2",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME1304",
+        "title": "Engineering Drawing",
+        "semester": "2",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "IS1302",
+        "title": "Engineering Mathematics II",
+        "semester": "2",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS1152",
+        "title": "Presentation Skills in English",
+        "semester": "2",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CE2301",
+        "title": "Structural Mechanics",
+        "semester": "3",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2302",
+        "title": "Fluid Mechanics",
+        "semester": "3",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2203",
+        "title": "Building Design Process",
+        "semester": "3",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2304",
+        "title": "Surveying I",
+        "semester": "3",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "IS2301",
+        "title": "Engineering Mathematics III",
+        "semester": "3",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS2202",
+        "title": "Engineering Mathematics IV",
+        "semester": "3",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS2261",
+        "title": "Accounting for Engineers",
+        "semester": "3",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CO2201",
+        "title": "Data Structures and Algorithms",
+        "semester": "3",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2202",
+        "title": "Computer Organization",
+        "semester": "3",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2203",
+        "title": "Object Oriented Programming",
+        "semester": "3",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2204",
+        "title": "Data Communication",
+        "semester": "3",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2105",
+        "title": "Field Visit",
+        "semester": "3",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "EE2206",
+        "title": "Circuit Theory",
+        "semester": "3",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2201",
+        "title": "Power Systems I",
+        "semester": "3",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2203",
+        "title": "Machines and Drives I",
+        "semester": "3",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2305",
+        "title": "Analog Electronics",
+        "semester": "3",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME2301",
+        "title": "Theory of Machines",
+        "semester": "3",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME2302",
+        "title": "Fluid Dynamics",
+        "semester": "3",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME2303",
+        "title": "Applied Thermodynamics I",
+        "semester": "3",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME2104",
+        "title": "Sensors and Actuators",
+        "semester": "3",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "EE2191",
+        "title": "Electrical Machines",
+        "semester": "3",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "CE2305",
+        "title": "Structural Analysis I",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2306",
+        "title": "Hydraulic Engineering",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2307",
+        "title": "Soil Mechanics and Engineering Geology I",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2208",
+        "title": "Construction Materials",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2209",
+        "title": "Environmental Engineering",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2210",
+        "title": "Highway and Transportation Engineering",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE2211",
+        "title": "Surveying II",
+        "semester": "4",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "IS2303",
+        "title": "Engineering Mathematics V",
+        "semester": "4",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS2262",
+        "title": "Economics and Management",
+        "semester": "4",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CO2206",
+        "title": "Operating Systems",
+        "semester": "4",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2307",
+        "title": "Software Engineering",
+        "semester": "4",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2208",
+        "title": "Computer Networks",
+        "semester": "4",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2209",
+        "title": "Embedded Systems",
+        "semester": "4",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO2210",
+        "title": "Programming Quest",
+        "semester": "4",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "ME2208",
+        "title": "Theory of Control Systems",
+        "semester": "4",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "EE2202",
+        "title": "Power Systems II",
+        "semester": "4",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2204",
+        "title": "Communication I",
+        "semester": "4",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2207",
+        "title": "Digital Electronics",
+        "semester": "4",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2208",
+        "title": "Embedded Systems",
+        "semester": "4",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE2309",
+        "title": "Electrical Installations",
+        "semester": "4",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME2305",
+        "title": "Strength of Materials I",
+        "semester": "4",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME2206",
+        "title": "Analysis of Manufacturing Processes",
+        "semester": "4",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME2307",
+        "title": "Design of Machine Elements",
+        "semester": "4",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME2209",
+        "title": "Fundamentals of Mechatronics",
+        "semester": "4",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "CE2300",
+        "title": "Industrial Training - Phase I",
+        "semester": "Industrial Training",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3301",
+        "title": "Structural Analysis II",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3202",
+        "title": "Design of Steel Structures",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3203",
+        "title": "Engineering Hydrology",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3204",
+        "title": "Soil Mechanics and Engineering Geology II",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3205",
+        "title": "Construction Planning and Cost Estimation",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3251",
+        "title": "Design of Timber Structures",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3261",
+        "title": "Environmental Hydraulics",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3271",
+        "title": "Traffic Engineering",
+        "semester": "5",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "IS3261",
+        "title": "Quantitative Methods in Management",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3162",
+        "title": "Intellectual Property",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3171",
+        "title": "Sri Lankan History and Culture",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3172",
+        "title": "Ethnic Cohesion and Social Harmony",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3173/IS3174",
+        "title": "Sinhala/Tamil",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CO3201",
+        "title": "Database Systems",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3302",
+        "title": "Computer Engineering Project",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3203",
+        "title": "Computer Security",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3251",
+        "title": "Natural Language Processing",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3252",
+        "title": "Management Information Systems",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3353",
+        "title": "Data Mining",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3261",
+        "title": "Cloud Computing and Applications",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3262",
+        "title": "Advanced Computer Architecture",
+        "semester": "5",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "IS3202",
+        "title": "Discrete Mathematics",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3201",
+        "title": "Algorithms and Optimization Methods",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3203",
+        "title": "Newtonian Mechanics and Lagrangian Dynamics",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3204",
+        "title": "Mathematical Modelling and Simulation",
+        "semester": "5",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "EE3201",
+        "title": "Signal Processing",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3202",
+        "title": "Machines and Drives II",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3151",
+        "title": "Introduction to Biomedical Engineering",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3252",
+        "title": "Anatomy and Control Systems of the Human Body I",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3253",
+        "title": "Introduction to Image Processing",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3361",
+        "title": "Communication II",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3262",
+        "title": "Data Communication",
+        "semester": "5",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME3201",
+        "title": "Strength of Materials II",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3202",
+        "title": "Fluid Machinery",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3203",
+        "title": "Dynamics of Mechanical Systems",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3205",
+        "title": "Automobile Technology",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3250",
+        "title": "Manufacturing Systems",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3351",
+        "title": "Production and Operations Management",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3352",
+        "title": "HVAC systems",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3253",
+        "title": "Piped Services",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3354",
+        "title": "Robotics and Vision Systems",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3255",
+        "title": "Microcontrollers and Microprocessor Based Systems",
+        "semester": "5",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "CE3306",
+        "title": "Design of Concrete Structures I",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3207",
+        "title": "Hydraulic Design",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3308",
+        "title": "Geotechnical Engineering",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3209",
+        "title": "Construction Management",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3110",
+        "title": "Surveying Field Project",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3252",
+        "title": "Design of Masonry Structures",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3262",
+        "title": "Environmental Geotechnics",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE3272",
+        "title": "Rail Transport Systems",
+        "semester": "6",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "IS3263",
+        "title": "Industrial Law",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3151",
+        "title": "Technical Writing",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3175",
+        "title": "Introduction to Philosophy",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3176",
+        "title": "Scientific Method",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3177",
+        "title": "Introduction to Psychology and Human Behaviour",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CO3204",
+        "title": "Robotic Design",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3205",
+        "title": "Intelligent systems",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3554",
+        "title": "Data Management Project",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3563",
+        "title": "High Performance Computing Project",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3255",
+        "title": "Information Security",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3256",
+        "title": "Quality Engineering",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3264",
+        "title": "Advanced Operating Systems",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3265",
+        "title": "Parallel Programming",
+        "semester": "6",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "IS3205",
+        "title": "Operations Research",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3206",
+        "title": "Advanced Probability and Statistical Analysis",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3207",
+        "title": "Time Series and Stochastic Processes",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3208",
+        "title": "Linear Models and Multivariate Statistics",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "IS3264",
+        "title": "Management for Engineers",
+        "semester": "6",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "EE3203",
+        "title": "Electromagnetics",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3204",
+        "title": "Industrial Automation and System Design",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3205",
+        "title": "Digital System Design",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3354",
+        "title": "Machine Learning",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3255",
+        "title": "Anatomy and Control Systems of the Human Body II",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3363",
+        "title": "Next Generation Networks",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE3264",
+        "title": "Digital Communication",
+        "semester": "6",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME3806",
+        "title": "Mechanical Engineering Design",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3207",
+        "title": "Applied Thermodynamics II",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3256",
+        "title": "Product – Process Design",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3357",
+        "title": "Group Project (Manufacturing)",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3258",
+        "title": "Electrical Installation, Distribution and Lighting",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3359",
+        "title": "Group Project (Building Services)",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3260",
+        "title": "Advanced Automation",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME3361",
+        "title": "Mechatronics Project",
+        "semester": "6",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "CE3300",
+        "title": "Industrial Training - Phase II",
+        "semester": "Industrial Training",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CO3600",
+        "title": "Industrial Training",
+        "semester": "Industrial Training",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "EE3600",
+        "title": "Industrial Training",
+        "semester": "Industrial Training",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME3600",
+        "title": "Industrial Training",
+        "semester": "Industrial Training",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "CE4301",
+        "title": "Design of Concrete Structures II",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4202",
+        "title": "Geotechnical Design",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4603",
+        "title": "Research Project",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4404",
+        "title": "Comprehensive Design Project",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4351",
+        "title": "Advanced Structural Analysis and Design I",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4352",
+        "title": "Bridge Engineering",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4361",
+        "title": "Water and Wastewater Engineering",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4362",
+        "title": "Environmental Pollution Control",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4371",
+        "title": "Highway Engineering Design",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4372",
+        "title": "Transportation Planning and Economics",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4305",
+        "title": "Highway and Transportation Engineering Design",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4306",
+        "title": "Water and Wastewater Treatment",
+        "semester": "7",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "IS4161",
+        "title": "Sustainability and Disaster Management",
+        "semester": "7",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CO4301",
+        "title": "Individual Research/Design Project",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4002",
+        "title": "Engineering Project",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4203",
+        "title": "Microcontrollers and Applications",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4204",
+        "title": "Computer Vision and Image Processing",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3554",
+        "title": "Data Management Project",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO3563",
+        "title": "High Performance Computing Project",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4351",
+        "title": "Advanced Database Systems",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4352",
+        "title": "Advanced Algorithms",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4361",
+        "title": "Concurrent Processing",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4362",
+        "title": "GPU Programming",
+        "semester": "7",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "EE4301",
+        "title": "Research and Design Project",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4002",
+        "title": "Engineering Project",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4303",
+        "title": "Robotics",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4204",
+        "title": "Power Electronic Circuit Design",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4205",
+        "title": "Electronic Manufacturing Systems",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4209",
+        "title": "Energy Studies",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4351",
+        "title": "Biomedical Image Analysis",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4252",
+        "title": "Biomedical Instrumentation",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4253",
+        "title": "Biomechanics",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4361",
+        "title": "Wireless Communication",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4262",
+        "title": "Internet of Things",
+        "semester": "7",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME4001",
+        "title": "Engineering Project",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4102",
+        "title": "Solid Mechanics",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4404",
+        "title": "Individual Research Project",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4103",
+        "title": "Advanced Fluid Dynamics",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4262",
+        "title": "Green Engineering and Environmental Compliance",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4363",
+        "title": "Advanced Manufacturing Processes",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4364",
+        "title": "Building Power Systems and Design",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4265",
+        "title": "Energy Performance in Buildings",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4366",
+        "title": "Computer-Based Measurement Systems",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4267",
+        "title": "Graphical Programing and Virtual Instrumentation",
+        "semester": "7",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "CE4603",
+        "title": "Research Project",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4404",
+        "title": "Comprehensive Design Project",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4353",
+        "title": "Advanced Structural Analysis and Design II",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4254",
+        "title": "Building Services",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4355",
+        "title": "Construction Technology",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4361",
+        "title": "Water and Wastewater Engineering",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4363",
+        "title": "Limnology",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4365",
+        "title": "Environmental Management",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4371",
+        "title": "Highway Engineering Design",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4373",
+        "title": "Traffic Management and Safety",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4264",
+        "title": "Environmental Impact Assessment",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4374",
+        "title": "Air and Water Transport Systems",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "CE4256",
+        "title": "Sustainable Design and Construction",
+        "semester": "8",
+        "department": "Civil Engineering"
+      },
+      {
+        "code": "IS4171",
+        "title": "Ethics in Engineering",
+        "semester": "8",
+        "department": "IS (General Studies)"
+      },
+      {
+        "code": "CO4002",
+        "title": "Engineering Project",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4205",
+        "title": "Compilers",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4306",
+        "title": "Software Architecture and Design",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4353",
+        "title": "Distributed Systems",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4254",
+        "title": "Machine Learning",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4255",
+        "title": "Bioinformatics",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4256",
+        "title": "Mobile Application Development",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "CO4263",
+        "title": "Scientific Computing",
+        "semester": "8",
+        "department": "Computer Engineering"
+      },
+      {
+        "code": "EE4002",
+        "title": "Engineering Project",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4308",
+        "title": "VLSI Circuits",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4354",
+        "title": "Mobile Application Development",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4206",
+        "title": "Power Systems III",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4207",
+        "title": "High Voltage Engineering",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4255",
+        "title": "Genetics",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4256",
+        "title": "Medical Informatics",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4263",
+        "title": "Information Theory and Coding",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "EE4264",
+        "title": "Cryptography and Network Security",
+        "semester": "8",
+        "department": "Electrical and Electronic Engineering"
+      },
+      {
+        "code": "ME4001",
+        "title": "Engineering Project",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4205",
+        "title": "Heat Transfer",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4106",
+        "title": "Advanced Machine Dynamics",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4369",
+        "title": "Computer Aided Manufacturing",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4270",
+        "title": "Industrial Automation",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4271",
+        "title": "Building Acoustics",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4372",
+        "title": "Facility and Building Environment Management",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4373",
+        "title": "Smart Sensors, Actuators and Intelligent Systems",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      },
+      {
+        "code": "ME4274",
+        "title": "Introduction to Micro-mechatronics",
+        "semester": "8",
+        "department": "Mechanical Engineering"
+      }
+    ]
+  }

@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tl-ingress
+  namespace: togetherlearn
+  annotations:
+    # Requires nginx ingress controller: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+    kubernetes.io/ingress.class: nginx
+    # TLS — requires cert-manager: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.5/cert-manager.yaml
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # WebSocket support (required for STOMP/SockJS chat)
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "15m"
+spec:
+  tls:
+    - hosts:
+        - app.togetherlearn.app
+        - api.togetherlearn.app
+      secretName: tl-tls
+  rules:
+    # Frontend — Next.js app
+    - host: app.togetherlearn.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 3000
+
+    # API Gateway — all REST + WebSocket traffic
+    - host: api.togetherlearn.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 8080

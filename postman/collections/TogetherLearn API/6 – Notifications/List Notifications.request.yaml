@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base}}/notifications?page=0&size=20"
+method: GET
+headers:
+  Authorization: Bearer {{token}}
+queryParams:
+  page: "0"
+  size: "20"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status 200', () => pm.response.to.have.status(200));
+      const r = pm.response.json();
+      pm.test('Has content', () => pm.expect(r.content).to.be.an('array'));
+    language: text/javascript
+order: 1000

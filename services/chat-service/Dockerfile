@@ -1,0 +1,18 @@
+FROM maven:3.9.6-eclipse-temurin-25-alpine AS build
+WORKDIR /workspace
+
+COPY pom.xml .
+RUN mvn -B install -N -q
+
+WORKDIR /workspace/chat-service
+COPY chat-service/pom.xml .
+RUN mvn -B dependency:resolve -q
+
+COPY chat-service/src ./src
+RUN mvn -B package -DskipTests -q
+
+FROM eclipse-temurin:25-jre-alpine
+WORKDIR /app
+COPY --from=build /workspace/chat-service/target/*.jar app.jar
+EXPOSE 8087
+ENTRYPOINT ["java", "-jar", "app.jar"]
