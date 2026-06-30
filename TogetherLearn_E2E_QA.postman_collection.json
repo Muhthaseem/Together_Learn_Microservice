@@ -1,0 +1,1724 @@
+{
+  "info": {
+    "name": "TogetherLearn — Full E2E QA Suite",
+    "_postman_id": "tl-e2e-qa-suite-v2",
+    "description": "One-click complete E2E test suite. Run with Collection Runner → covers all 9 microservices, 60+ endpoints, auth flows, multi-user scenarios, and error cases.\n\nPrerequisites: All services running (API Gateway :8080), PostgreSQL, RabbitMQ, MinIO.\n\nHow to run:\n1. Import collection\n2. Click 'Run collection'\n3. Iterations = 1, delay = 300ms\n4. Run — all IDs auto-wire between requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base",         "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "gatewayBase",  "value": "http://localhost:8080",     "type": "string" },
+    { "key": "eurekaBase",   "value": "http://localhost:8761",     "type": "string" },
+    { "key": "testPassword", "value": "Test@12345",                "type": "string" },
+    { "key": "testEmail1",   "value": "",  "type": "string" },
+    { "key": "testEmail2",   "value": "",  "type": "string" },
+    { "key": "adminEmail",   "value": "",  "type": "string" },
+    { "key": "token",        "value": "",  "type": "string" },
+    { "key": "userId",       "value": "",  "type": "string" },
+    { "key": "token2",       "value": "",  "type": "string" },
+    { "key": "userId2",      "value": "",  "type": "string" },
+    { "key": "adminToken",   "value": "",  "type": "string" },
+    { "key": "adminUserId",  "value": "",  "type": "string" },
+    { "key": "groupId",      "value": "",  "type": "string" },
+    { "key": "questionId",   "value": "",  "type": "string" },
+    { "key": "answerId",     "value": "",  "type": "string" },
+    { "key": "replyId",      "value": "",  "type": "string" },
+    { "key": "offerId",      "value": "",  "type": "string" },
+    { "key": "requestId",    "value": "",  "type": "string" },
+    { "key": "applicationId","value": "",  "type": "string" },
+    { "key": "sessionId",    "value": "",  "type": "string" },
+    { "key": "notificationId","value": "", "type": "string" },
+    { "key": "fileKey",      "value": "",  "type": "string" },
+    { "key": "testRunId",    "value": "",  "type": "string" },
+    { "key": "scheduledDate","value": "",  "type": "string" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Re-initialize if first run OR if >5 min since last init (= new Collection Runner press)",
+          "const ts = Date.now();",
+          "const lastTs = parseInt(pm.collectionVariables.get('testRunId') || '0');",
+          "if (!lastTs || (ts - lastTs) > 300000) {",
+          "  pm.collectionVariables.set('testRunId',    ts.toString());",
+          "  pm.collectionVariables.set('testEmail1',   `tl_s1_${ts}@test.edu`);",
+          "  pm.collectionVariables.set('testEmail2',   `tl_s2_${ts}@test.edu`);",
+          "  pm.collectionVariables.set('adminEmail',   `tl_admin_${ts}@test.edu`);",
+          "  pm.collectionVariables.set('regNum1',      `EN${ts.toString().slice(-6)}1`);",
+          "  pm.collectionVariables.set('regNum2',      `EN${ts.toString().slice(-6)}2`);",
+          "  pm.collectionVariables.set('idxNum1',      `IDX${ts.toString().slice(-5)}1`);",
+          "  pm.collectionVariables.set('idxNum2',      `IDX${ts.toString().slice(-5)}2`);",
+          "  const d = new Date(); d.setDate(d.getDate() + 7);",
+          "  pm.collectionVariables.set('scheduledDate', d.toISOString().split('T')[0]);",
+          "  // Clear all IDs from any previous run",
+          "  ['token','userId','token2','userId2','adminToken','adminUserId',",
+          "   'groupId','questionId','answerId','replyId','offerId',",
+          "   'requestId','applicationId','sessionId','notificationId','fileKey'",
+          "  ].forEach(k => pm.collectionVariables.set(k, ''));",
+          "  console.log('[TL QA] New run initialised — email suffix:', ts.toString().slice(-6));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+
+    {
+      "name": "0 – Health Checks",
+      "item": [
+        {
+          "name": "Eureka Dashboard",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Eureka reachable (200)', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "{{eurekaBase}}" }
+        },
+        {
+          "name": "Gateway Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Gateway UP', () => pm.response.to.have.status(200));",
+            "const b = pm.response.json();",
+            "pm.test('Status UP', () => pm.expect(b.status).to.eql('UP'));"
+          ]}}],
+          "request": { "method": "GET", "url": "{{gatewayBase}}/actuator/health" }
+        },
+        {
+          "name": "User Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('User Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8081/actuator/health" }
+        },
+        {
+          "name": "Course Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Course Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8082/actuator/health" }
+        },
+        {
+          "name": "Group Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Group Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8083/actuator/health" }
+        },
+        {
+          "name": "Q&A Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('QA Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8084/actuator/health" }
+        },
+        {
+          "name": "Peer Teaching Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Peer Teaching UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8085/actuator/health" }
+        },
+        {
+          "name": "Notification Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Notification Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8086/actuator/health" }
+        },
+        {
+          "name": "Chat Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Chat Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8087/actuator/health" }
+        },
+        {
+          "name": "File Service Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('File Service UP', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": { "method": "GET", "url": "http://localhost:8088/actuator/health" }
+        }
+      ]
+    },
+
+    {
+      "name": "1 – Auth",
+      "item": [
+        {
+          "name": "Register User 1 (Student)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const ts = pm.collectionVariables.get('testRunId') || Date.now();",
+                "pm.variables.set('_reg1', JSON.stringify({",
+                "  name: 'Test Student One',",
+                "  email: pm.collectionVariables.get('testEmail1'),",
+                "  password: pm.collectionVariables.get('testPassword'),",
+                "  department: 'CO',",
+                "  batch: 'Batch 5',",
+                "  registrationNumber: `EN${ts}`.slice(0,10),",
+                "  indexNumber: `20/ENG/${ts}`.slice(0,14)",
+                "}));"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "const r = pm.response.json();",
+                "pm.test('Has token', () => pm.expect(r.token).to.be.a('string'));",
+                "pm.test('Has userId', () => pm.expect(r.userId).to.be.a('string'));",
+                "pm.collectionVariables.set('token',  r.token);",
+                "pm.collectionVariables.set('userId', r.userId);",
+                "console.log('[Auth] User 1 registered, userId:', r.userId);"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Student One\",\n  \"email\": \"{{testEmail1}}\",\n  \"password\": \"{{testPassword}}\",\n  \"department\": \"CO\",\n  \"batch\": \"Batch 5\",\n  \"registrationNumber\": \"{{regNum1}}\",\n  \"indexNumber\": \"{{idxNum1}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.test('Has token', () => pm.expect(r.token).to.be.a('string'));",
+                "pm.test('Has userId', () => pm.expect(r.userId).to.be.a('string'));",
+                "pm.test('Token is JWT', () => pm.expect(r.token.split('.').length).to.eql(3));",
+                "pm.collectionVariables.set('token',  r.token);",
+                "pm.collectionVariables.set('userId', r.userId);",
+                "console.log('[Auth] User 1 login OK');"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail1}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register User 2 (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "const r = pm.response.json();",
+                "pm.test('Has token2', () => pm.expect(r.token).to.be.a('string'));",
+                "pm.collectionVariables.set('token2',  r.token);",
+                "pm.collectionVariables.set('userId2', r.userId);",
+                "console.log('[Auth] User 2 registered, userId:', r.userId);"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Student Two\",\n  \"email\": \"{{testEmail2}}\",\n  \"password\": \"{{testPassword}}\",\n  \"department\": \"CO\",\n  \"batch\": \"Batch 4\",\n  \"registrationNumber\": \"{{regNum2}}\",\n  \"indexNumber\": \"{{idxNum2}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.collectionVariables.set('token2',  r.token);",
+                "pm.collectionVariables.set('userId2', r.userId);",
+                "console.log('[Auth] User 2 login OK');"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail2}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Profile (User 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.test('Has userId', () => pm.expect(r.userId || r.id).to.be.a('string'));",
+                "pm.test('Has email', () => pm.expect(r.email).to.be.a('string'));",
+                "pm.test('Is CO department', () => pm.expect(r.department).to.eql('CO'));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/users/{{userId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get My Profile (User 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.test('User 2 profile returned', () => pm.expect(r.userId || r.id).to.eql(pm.collectionVariables.get('userId2')));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/users/{{userId2}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        },
+        {
+          "name": "Search Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/users?q=Test", "query": [{ "key": "q", "value": "Test" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update User 1 Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/users/{{userId}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Student One Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password (User 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200 or 204', () => {",
+                "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                "});"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/change-password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"{{testPassword}}\",\n  \"newPassword\": \"NewTest@12345\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login After Password Change (re-auth)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.collectionVariables.set('token',  r.token);",
+                "pm.collectionVariables.set('userId', r.userId);"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail1}}\",\n  \"password\": \"NewTest@12345\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reset to Original Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200,204]));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/change-password",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"NewTest@12345\",\n  \"newPassword\": \"{{testPassword}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Re-Login User 1 (restore token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.collectionVariables.set('token',  r.token);",
+                "pm.collectionVariables.set('userId', r.userId);"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail1}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "2 – Meta & Courses",
+      "item": [
+        {
+          "name": "Get Departments",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Is array', () => pm.expect(r).to.be.an('array'));",
+            "pm.test('Has departments', () => pm.expect(r.length).to.be.above(0));",
+            "pm.test('Contains CO', () => pm.expect(r.some(d => d === 'CO' || (d.code && d.code === 'CO') || JSON.stringify(d).includes('CO'))).to.be.true);"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/meta/departments",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Batches",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Is array', () => pm.expect(r).to.be.an('array'));",
+            "pm.test('Has batches', () => pm.expect(r.length).to.be.above(0));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/meta/batches",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List All Courses",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Returns array', () => pm.expect(r).to.be.an('array'));",
+            "pm.test('Has courses', () => pm.expect(r.length).to.be.above(0));",
+            "if (r.length > 0) {",
+            "  const c = r[0];",
+            "  pm.test('Course has code', () => pm.expect(c.courseCode || c.code).to.be.a('string'));",
+            "  pm.collectionVariables.set('sampleCourseCode', (c.courseCode || c.code));",
+            "}"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/courses",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Courses by Department (CO)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/courses?department=CO", "query": [{ "key": "department", "value": "CO" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Courses by Semester",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/courses?department=CO&semester=3", "query": [{ "key": "department", "value": "CO" }, { "key": "semester", "value": "3" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Search Courses",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/courses?q=data", "query": [{ "key": "q", "value": "data" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Course by Code (CO3040)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 404', () => pm.expect(pm.response.code).to.be.oneOf([200, 404]));",
+            "if (pm.response.code === 200) {",
+            "  const r = pm.response.json();",
+            "  pm.test('Has courseCode', () => pm.expect(r.courseCode || r.code).to.be.a('string'));",
+            "}"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/courses/CO3040",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "3 – Groups E2E",
+      "item": [
+        {
+          "name": "Create Group (User 1)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const d = new Date(); d.setDate(d.getDate() + 7);",
+                "pm.variables.set('_futureDate', d.toISOString().split('T')[0]);"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "const r = pm.response.json();",
+                "pm.test('Has groupId', () => pm.expect(r.groupId || r.id).to.be.a('string'));",
+                "pm.test('Has title', () => pm.expect(r.title).to.be.a('string'));",
+                "pm.collectionVariables.set('groupId', r.groupId || r.id);",
+                "console.log('[Groups] Created groupId:', r.groupId || r.id);"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/groups",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"CO3040 Distributed Systems Study\",\n  \"description\": \"Weekly revision of distributed systems concepts for finals\",\n  \"courseCode\": \"CO3040\",\n  \"scheduledDate\": \"{{scheduledDate}}\",\n  \"scheduledTime\": \"14:00:00\",\n  \"location\": \"Library Room 3\",\n  \"mode\": \"PHYSICAL\",\n  \"maxParticipants\": 10\n}"
+            }
+          }
+        },
+        {
+          "name": "List All Groups",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/groups",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Groups by Course",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Returns array', () => pm.expect(r).to.be.an('array'));",
+            "pm.test('Has the created group', () => {",
+            "  const gid = pm.collectionVariables.get('groupId');",
+            "  pm.expect(r.some(g => (g.groupId || g.id) === gid)).to.be.true;",
+            "});"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/groups?courseCode=CO3040", "query": [{ "key": "courseCode", "value": "CO3040" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Group Detail",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Correct groupId', () => pm.expect(r.groupId || r.id).to.eql(pm.collectionVariables.get('groupId')));",
+            "pm.test('Has title', () => pm.expect(r.title).to.be.a('string'));",
+            "pm.test('Has members list', () => pm.expect(r.members || r.participants).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/groups/{{groupId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update Group (User 1 – creator)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Title updated', () => pm.expect(pm.response.json().title).to.include('Updated'));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/groups/{{groupId}}",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"CO3040 Distributed Systems Study (Updated)\",\n  \"description\": \"Updated weekly revision sessions\",\n  \"maxParticipants\": 12\n}"
+            }
+          }
+        },
+        {
+          "name": "Join Group (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/groups/{{groupId}}/join",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Post Chat Message (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "const r = pm.response.json();",
+            "pm.test('Has messageId', () => pm.expect(r.messageId || r.id).to.be.a('string'));",
+            "pm.test('Has content', () => pm.expect(r.content).to.be.a('string'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/messages/groups/{{groupId}}",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello everyone! Ready for today's study session on distributed consensus?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Post Chat Message (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/messages/groups/{{groupId}}",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token2}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Yes! Let's start with Raft consensus algorithm.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Chat Messages (paginated)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Has content array', () => pm.expect(r.content || r).to.be.an('array'));",
+            "const msgs = r.content || r;",
+            "pm.test('Has at least 2 messages', () => pm.expect(msgs.length).to.be.at.least(2));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/messages/groups/{{groupId}}?page=0&size=20", "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Leave Group (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/groups/{{groupId}}/leave",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Delete Group (User 1 – creator)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base}}/groups/{{groupId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "4 – Q&A E2E",
+      "item": [
+        {
+          "name": "Create Question (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "const r = pm.response.json();",
+            "pm.test('Has questionId', () => pm.expect(r.questionId || r.id).to.be.a('string'));",
+            "pm.test('Has title', () => pm.expect(r.title).to.be.a('string'));",
+            "pm.collectionVariables.set('questionId', r.questionId || r.id);",
+            "console.log('[QA] Created questionId:', r.questionId || r.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"What is the CAP theorem and why does it matter?\",\n  \"body\": \"I'm studying for the CO3040 exam. Can someone explain Consistency, Availability, and Partition Tolerance with a real-world example?\",\n  \"courseCode\": \"CO3040\",\n  \"tags\": \"distributed-systems,cap-theorem,consistency\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List All Questions",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/questions",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Questions by Course",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Returns array', () => pm.expect(r).to.be.an('array'));",
+            "pm.test('Has the created question', () => {",
+            "  const qid = pm.collectionVariables.get('questionId');",
+            "  pm.expect(r.some(q => (q.questionId || q.id) === qid)).to.be.true;",
+            "});"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/questions?courseCode=CO3040", "query": [{ "key": "courseCode", "value": "CO3040" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Questions by Status (OPEN)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/questions?status=OPEN", "query": [{ "key": "status", "value": "OPEN" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Question Detail",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Correct questionId', () => pm.expect(r.questionId || r.id).to.eql(pm.collectionVariables.get('questionId')));",
+            "pm.test('Has answers array', () => pm.expect(r.answers).to.be.an('array'));",
+            "pm.test('Has vote count', () => pm.expect(r.voteCount !== undefined).to.be.true);"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/questions/{{questionId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Vote Question UP (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions/{{questionId}}/vote",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token2}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"UP\"\n}" }
+          }
+        },
+        {
+          "name": "Bookmark Question (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions/{{questionId}}/bookmark",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token2}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Get Bookmarked Questions (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Returns array', () => pm.expect(r).to.be.an('array'));",
+            "pm.test('Has bookmarked question', () => {",
+            "  const qid = pm.collectionVariables.get('questionId');",
+            "  pm.expect(r.some(q => (q.questionId || q.id) === qid)).to.be.true;",
+            "});"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/questions/bookmarked",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        },
+        {
+          "name": "Remove Bookmark (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base}}/questions/{{questionId}}/bookmark",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        },
+        {
+          "name": "Add Answer (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "const r = pm.response.json();",
+            "pm.test('Has answerId', () => pm.expect(r.answerId || r.id).to.be.a('string'));",
+            "pm.collectionVariables.set('answerId', r.answerId || r.id);",
+            "console.log('[QA] Created answerId:', r.answerId || r.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions/{{questionId}}/answers",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token2}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"The CAP theorem states that a distributed system can only guarantee two of three: Consistency (all nodes see same data), Availability (every request gets a response), and Partition Tolerance (system works despite network failures). Real example: during a network split, Cassandra chooses Availability+Partition while HBase chooses Consistency+Partition.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Answer (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token2}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"The CAP theorem states that a distributed system can only guarantee two of three: Consistency, Availability, and Partition Tolerance. UPDATED: Brewer proved this in 2000, and it was later formalized by Gilbert and Lynch in 2002.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Reply to Answer (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "const r = pm.response.json();",
+            "pm.test('Has replyId', () => pm.expect(r.replyId || r.id).to.be.a('string'));",
+            "pm.collectionVariables.set('replyId', r.replyId || r.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}/replies",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great explanation! Could you add more about the PACELC theorem which extends CAP?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Reply (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}/replies/{{replyId}}",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great explanation! Could you also mention the PACELC theorem which extends CAP by adding latency considerations?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Vote Answer UP (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}/vote",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"UP\"\n}" }
+          }
+        },
+        {
+          "name": "Accept Answer (User 1 – question author)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+            "const r = pm.response.json();",
+            "if (r && r.status) pm.test('Status ANSWERED', () => pm.expect(r.status).to.eql('ANSWERED'));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}/accept",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Delete Reply (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}/replies/{{replyId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Delete Answer (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base}}/questions/{{questionId}}/answers/{{answerId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        },
+        {
+          "name": "Delete Question (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base}}/questions/{{questionId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "5 – Peer Teaching E2E",
+      "item": [
+        {
+          "name": "Create Peer Offer (User 2 can teach)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "const r = pm.response.json();",
+            "pm.test('Has offerId', () => pm.expect(r.offerId || r.id).to.be.a('string'));",
+            "pm.collectionVariables.set('offerId', r.offerId || r.id);",
+            "console.log('[Peer] Created offerId:', r.offerId || r.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/peer-offers",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token2}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"CO3040\",\n  \"title\": \"Distributed Systems tutoring\",\n  \"description\": \"I can explain CAP theorem, consensus algorithms, and microservices patterns\",\n  \"availability\": \"Weekday evenings and weekends\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Peer Offers",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/peer-offers",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Peer Offers by Course",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Has the created offer', () => {",
+            "  const oid = pm.collectionVariables.get('offerId');",
+            "  pm.expect(r.some(o => (o.offerId || o.id) === oid)).to.be.true;",
+            "});"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/peer-offers?courseCode=CO3040", "query": [{ "key": "courseCode", "value": "CO3040" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Create Peer Request (User 1 needs help)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 201', () => pm.response.to.have.status(201));",
+            "const r = pm.response.json();",
+            "pm.test('Has requestId', () => pm.expect(r.requestId || r.id).to.be.a('string'));",
+            "pm.collectionVariables.set('requestId', r.requestId || r.id);",
+            "console.log('[Peer] Created requestId:', r.requestId || r.id);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/peer-requests",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"CO3040\",\n  \"title\": \"Need help understanding Raft consensus\",\n  \"description\": \"I am struggling with the leader election and log replication phases of the Raft algorithm. Need a 1-hour session.\",\n  \"preferredTime\": \"Weekend afternoons\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List All Peer Requests",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/peer-requests",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "List Peer Requests by Course",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/peer-requests?courseCode=CO3040", "query": [{ "key": "courseCode", "value": "CO3040" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Peer Request Detail",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Correct requestId', () => pm.expect(r.requestId || r.id).to.eql(pm.collectionVariables.get('requestId')));",
+            "pm.test('Has applications array', () => pm.expect(r.applications || []).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/peer-requests/{{requestId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Apply to Peer Request (User 2 offers to tutor)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+            "const r = pm.response.json();",
+            "const appId = r.applicationId || r.id;",
+            "if (appId) {",
+            "  pm.collectionVariables.set('applicationId', appId);",
+            "  console.log('[Peer] Created applicationId:', appId);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/peer-requests/{{requestId}}/apply",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token2}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"I have strong knowledge of Raft from my distributed systems coursework. I can explain the leader election, log replication, and safety guarantees in detail.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Request with Applications (User 1 checks applicants)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "// Extract applicationId from embedded applications if not set",
+                "const appId = pm.collectionVariables.get('applicationId');",
+                "console.log('[Peer] Current applicationId:', appId);"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "const apps = r.applications || [];",
+                "pm.test('Has at least 1 application', () => pm.expect(apps.length).to.be.at.least(1));",
+                "if (apps.length > 0 && !pm.collectionVariables.get('applicationId')) {",
+                "  pm.collectionVariables.set('applicationId', apps[0].applicationId || apps[0].id);",
+                "  console.log('[Peer] applicationId from list:', apps[0].applicationId || apps[0].id);",
+                "}"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/peer-requests/{{requestId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Accept Application (User 1 → creates session)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+            "const r = pm.response.json();",
+            "const sid = r.sessionId || (r.session && r.session.sessionId) || r.id;",
+            "if (sid) {",
+            "  pm.collectionVariables.set('sessionId', sid);",
+            "  console.log('[Peer] Created sessionId:', sid);",
+            "  pm.test('Has sessionId', () => pm.expect(sid).to.be.a('string'));",
+            "}"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/peer-requests/{{requestId}}/applications/{{applicationId}}/accept",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Get My Sessions (User 1 – learner)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Returns array', () => pm.expect(r).to.be.an('array'));",
+            "if (r.length > 0 && !pm.collectionVariables.get('sessionId')) {",
+            "  pm.collectionVariables.set('sessionId', r[0].sessionId || r[0].id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/sessions/my",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Session Detail",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Has sessionId', () => pm.expect(r.sessionId || r.id).to.be.a('string'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/sessions/{{sessionId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Complete Session",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/sessions/{{sessionId}}/complete",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Rate Session (User 1 rates tutor User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/sessions/{{sessionId}}/rate",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"feedback\": \"Excellent explanation of Raft! Very clear and patient. Highly recommended.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Tutor Stats (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Has session count', () => pm.expect(r.totalSessions !== undefined || r.sessionCount !== undefined).to.be.true);"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/sessions/tutors/{{userId2}}/stats",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "6 – Notifications",
+      "item": [
+        {
+          "name": "List Notifications (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "const items = r.content || r;",
+            "pm.test('Returns array/page', () => pm.expect(items).to.be.an('array'));",
+            "if (items.length > 0) {",
+            "  pm.collectionVariables.set('notificationId', items[0].notificationId || items[0].id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/notifications?page=0&size=20", "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Unread Count (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "pm.test('Has count field', () => pm.expect(r.count !== undefined || r.unreadCount !== undefined || typeof r === 'number').to.be.true);"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/notifications/unread-count",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Mark One Notification Read (User 1)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const nid = pm.collectionVariables.get('notificationId');",
+                "if (!nid) console.warn('[Notifications] No notificationId set – skipping mark-read');"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "const nid = pm.collectionVariables.get('notificationId');",
+                "if (!nid) { console.warn('SKIP: no notificationId'); return; }",
+                "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/notifications/{{notificationId}}/read",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Mark All Notifications Read (User 1)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/notifications/read-all",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "List Notifications (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/notifications",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        },
+        {
+          "name": "Get Unread Count (User 2)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/notifications/unread-count",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "7 – File Service",
+      "item": [
+        {
+          "name": "Upload File (text/plain)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+            "const r = pm.response.json();",
+            "pm.test('Has file key', () => pm.expect(r.key).to.be.a('string'));",
+            "pm.test('Has url', () => pm.expect(r.url).to.be.a('string'));",
+            "pm.collectionVariables.set('fileKey', r.key);",
+            "console.log('[Files] Uploaded fileKey:', r.key);"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{base}}/files/upload?folder=test-uploads", "query": [{ "key": "folder", "value": "test-uploads" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "text",
+                  "value": "TogetherLearn QA test file content. This is a plain text test upload.",
+                  "description": "Replace with actual file for binary upload testing"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Presigned URL",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const key = pm.collectionVariables.get('fileKey');",
+                "if (!key) console.warn('[Files] No fileKey set – upload may have failed');"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                "const r = pm.response.json();",
+                "pm.test('Has presigned URL', () => pm.expect(r.url || r.presignedUrl).to.be.a('string'));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base}}/files/presigned?key={{fileKey}}&expiryMinutes=60", "query": [{ "key": "key", "value": "{{fileKey}}" }, { "key": "expiryMinutes", "value": "60" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Delete File",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base}}/files?key={{fileKey}}", "query": [{ "key": "key", "value": "{{fileKey}}" }] },
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "8 – Users & Courses (Admin)",
+      "item": [
+        {
+          "name": "List All Users",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/users",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get User 1 Courses",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/users/{{userId}}/courses",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Update User 1 Courses",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/users/{{userId}}/courses",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\"CO3040\", \"CO2030\"]"
+            }
+          }
+        },
+        {
+          "name": "[Admin] Change User Role – SKIP if no adminToken",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const adminTok = pm.collectionVariables.get('adminToken');",
+                "if (!adminTok) {",
+                "  pm.variables.set('_skipAdmin', 'true');",
+                "  console.warn('[Admin] SKIP: adminToken not set. Set adminToken variable to run admin tests.');",
+                "}"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "if (pm.variables.get('_skipAdmin') === 'true') {",
+                "  console.warn('[Admin] SKIPPED – no adminToken');",
+                "  return;",
+                "}",
+                "pm.test('Status 200', () => pm.response.to.have.status(200));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "url": "{{base}}/users/{{userId2}}/role",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[Admin] Create Course – SKIP if no adminToken",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const adminTok = pm.collectionVariables.get('adminToken');",
+                "if (!adminTok) {",
+                "  pm.variables.set('_skipAdmin', 'true');",
+                "  console.warn('[Admin] SKIP: adminToken not set.');",
+                "} else {",
+                "  pm.variables.set('_skipAdmin', 'false');",
+                "}"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "if (pm.variables.get('_skipAdmin') === 'true') return;",
+                "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                "const r = pm.response.json();",
+                "pm.collectionVariables.set('testCourseCode', r.courseCode || r.code);"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/courses",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"TST999\",\n  \"name\": \"Test Course for QA\",\n  \"department\": \"CO\",\n  \"semester\": 6,\n  \"credits\": 3,\n  \"description\": \"Automated QA test course\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[Admin] Delete Course – SKIP if no adminToken",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const adminTok = pm.collectionVariables.get('adminToken');",
+                "const code = pm.collectionVariables.get('testCourseCode');",
+                "if (!adminTok || !code) pm.variables.set('_skipAdmin', 'true');"
+              ]}
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "if (pm.variables.get('_skipAdmin') === 'true') return;",
+                "pm.test('Status 200 or 204', () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+              ]}
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base}}/courses/{{testCourseCode}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }]
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "9 – Negative / Error Cases",
+      "item": [
+        {
+          "name": "Unauthenticated request → 401",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Returns 401 without token', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/groups"
+          }
+        },
+        {
+          "name": "Invalid JWT token → 401",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Returns 401 with bad token', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/questions",
+            "header": [{ "key": "Authorization", "value": "Bearer this.is.an.invalid.jwt.token.that.will.fail" }]
+          }
+        },
+        {
+          "name": "Non-existent Group → 404",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Returns 404 for missing resource', () => pm.response.to.have.status(404));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/groups/00000000-0000-0000-0000-000000000000",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Non-existent Question → 404",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Returns 404', () => pm.response.to.have.status(404));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base}}/questions/00000000-0000-0000-0000-000000000000",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Invalid Login Credentials → 401",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Returns 401 for bad credentials', () => pm.response.to.have.status(401));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent@test.edu\",\n  \"password\": \"wrongpassword999\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Duplicate Registration → 409 or 400",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Rejects duplicate email', () => pm.expect(pm.response.code).to.be.oneOf([400, 409, 422]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Duplicate User\",\n  \"email\": \"{{testEmail1}}\",\n  \"password\": \"{{testPassword}}\",\n  \"department\": \"CO\",\n  \"batch\": \"Batch 5\",\n  \"registrationNumber\": \"EN202099\",\n  \"indexNumber\": \"20/ENG/099\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Empty Request Body → 400",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Rejects empty body', () => pm.expect(pm.response.code).to.be.oneOf([400, 422]));"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base}}/groups",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        },
+        {
+          "name": "Gateway Circuit Breaker Health",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const r = pm.response.json();",
+            "console.log('[Gateway] Circuit breakers:', JSON.stringify(r));"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{gatewayBase}}/actuator/health/circuitBreakers",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    }
+
+  ]
+}
