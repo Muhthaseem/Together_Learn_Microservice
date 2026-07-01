@@ -1,3 +1,5 @@
+version: "2.4"
+
 # Shared secrets / URIs — referenced via YAML anchors
 x-jwt-secret: &jwt-secret "tl-jwt-secret-change-in-production-min-32-chars"
 x-eureka-uri: &eureka-uri "http://discovery-server:8761/eureka"
@@ -178,8 +180,8 @@ services:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 15s
       timeout: 10s
-      retries: 5
-      start_period: 30s
+      retries: 10
+      start_period: 90s
     restart: unless-stopped
 
   # ──────────────────────────────────────────────────────────────────
@@ -584,8 +586,8 @@ services:
       test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"' || exit 1"]
       interval: 15s
       timeout: 10s
-      retries: 10
-      start_period: 60s
+      retries: 20
+      start_period: 120s
     restart: unless-stopped
 
   # ──────────────────────────────────────────────────────────────────
