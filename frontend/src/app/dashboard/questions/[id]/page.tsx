@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { questionsApi, type Question, uploadApi } from "@/lib/api";
+import { questionsApi, type Question, filesApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -137,13 +137,13 @@ export default function QuestionDetailPage() {
     try {
       const attachments: string[] = [];
       if (files.length) {
-        const up = await uploadApi.upload(files);
-        attachments.push(...up.files.map(f => f.url));
+        const results = await Promise.all(files.map(f => filesApi.upload(f)));
+        attachments.push(...results.map(r => r.url));
       }
       if (audio) {
         const file = new File([audio], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
-        const up = await uploadApi.upload([file]);
-        attachments.push(...up.files.map(f => f.url));
+        const result = await filesApi.upload(file);
+        attachments.push(result.url);
       }
       await questionsApi.addAnswer(id, { answeredById: user.userId, authorName: user.name, text: values.text, attachments } as any);
       toast.success("Answer posted");
@@ -495,8 +495,8 @@ export default function QuestionDetailPage() {
               setSavingQuestion(true);
               let finalQAttachments = editQuestion.attachments.slice();
               if (newEditFiles.length) {
-                const up = await uploadApi.upload(newEditFiles);
-                finalQAttachments = finalQAttachments.concat(up.files.map(f => f.url));
+                const results = await Promise.all(newEditFiles.map(f => filesApi.upload(f)));
+                finalQAttachments = finalQAttachments.concat(results.map(r => r.url));
               }
               await questionsApi.update(q.questionId, { title: editQuestion.title, description: editQuestion.description, attachments: finalQAttachments });
               toast.success('Question updated');
@@ -638,14 +638,14 @@ export default function QuestionDetailPage() {
               try {
                 setSavingEditAnswer(true);
                 let finalAttachments = editAnswer.attachments.slice();
-                if (newEditFiles.length || editAudio) {
-                  const up = await uploadApi.upload(newEditFiles);
-                  finalAttachments = finalAttachments.concat(up.files.map(f => f.url));
-                  if (editAudio) {
-                    const file = new File([editAudio], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
-                    const upA = await uploadApi.upload([file]);
-                    finalAttachments = finalAttachments.concat(upA.files.map(f => f.url));
-                  }
+                if (newEditFiles.length) {
+                  const results = await Promise.all(newEditFiles.map(f => filesApi.upload(f)));
+                  finalAttachments = finalAttachments.concat(results.map(r => r.url));
+                }
+                if (editAudio) {
+                  const file = new File([editAudio], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
+                  const result = await filesApi.upload(file);
+                  finalAttachments.push(result.url);
                 }
                 await questionsApi.updateAnswer(q.questionId, editAnswer.id, { text: editAnswer.text, attachments: finalAttachments });
                 toast.success('Answer updated');
@@ -820,8 +820,8 @@ function ReplySection({ questionId, ownerUserId, answer, currentUserName, onRelo
       setSaving(true);
       const attachments: string[] = [];
       if (rFiles.length) {
-        const up = await uploadApi.upload(rFiles);
-        attachments.push(...up.files.map(f => f.url));
+        const results = await Promise.all(rFiles.map(f => filesApi.upload(f)));
+        attachments.push(...results.map(r => r.url));
       }
       await questionsApi.addReply(questionId, answer.answerId, { repliedById: user.userId, authorName: user.name, text: text.trim(), attachments } as any);
       setText("");
@@ -959,8 +959,8 @@ function ReplySection({ questionId, ownerUserId, answer, currentUserName, onRelo
                 if (editAudio) toUpload.push(new File([editAudio], `audio-${Date.now()}.webm`, { type: 'audio/webm' }));
                 let newUrls: string[] = [];
                 if (toUpload.length) {
-                  const up = await uploadApi.upload(toUpload);
-                  newUrls = up.files.map(f => f.url);
+                  const results = await Promise.all(toUpload.map(f => filesApi.upload(f)));
+                  newUrls = results.map(r => r.url);
                 }
                 const final = [...(editOpen.attachments || []), ...newUrls];
                 await questionsApi.updateReply(questionId, answer.answerId, editOpen.replyId, { text: editOpen.text, attachments: final });

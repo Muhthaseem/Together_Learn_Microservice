@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { CourseModule } from "@/lib/api";
-import { groupsApi, coursesApi, usersApi, metaApi, uploadApi, peerApi } from "@/lib/api";
+import { groupsApi, coursesApi, usersApi, metaApi, filesApi, peerApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
@@ -155,8 +155,8 @@ export default function GroupsPage() {
       }
       if (audioBlob) filesToUpload.push(new File([audioBlob], `voice-${Date.now()}.webm`, { type: 'audio/webm' }));
       if (filesToUpload.length) {
-        const up = await uploadApi.upload(filesToUpload);
-        attachments = up.files.map(f => f.url);
+        const results = await Promise.all(filesToUpload.map(f => filesApi.upload(f)));
+        attachments = results.map(r => r.url);
       }
       await groupsApi.messages.create(detail.groupId, { text: msgText.trim() || undefined, attachmentUrl: attachments.length ? attachments[0] : undefined });
       setMsgText("");

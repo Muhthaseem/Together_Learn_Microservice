@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { usersApi, authApi, uploadApi } from "@/lib/api";
+import { usersApi, authApi, filesApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { PageContainer, SectionHeader } from "@/components/ui/Page";
 import { Card } from "@/components/ui/Card";
@@ -360,8 +360,8 @@ export default function ProfilePage() {
                   const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
                   try {
                     setUploading(true);
-                    const up = await uploadApi.upload([file]);
-                const url = up.files[0]?.url;
+                    const result = await filesApi.upload(file, 'avatars');
+                const url = result.url;
                 if (url) setPendingAvatarUrl(url);
                 toast.success('Avatar staged. Save changes to apply.');
                     setAvatarOpen(false);

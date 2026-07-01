@@ -258,15 +258,16 @@ export const questionsApi = {
       courseCode: payload.courseModule,
       authorName: payload.userName,
       tags: '',
+      attachmentUrls: payload.attachments || [],
     }).then(_mapQuestion),
   addAnswer: (id: string, payload: { answeredBy?: string; answeredById?: string; authorName?: string; text: string; attachments?: string[] }) =>
-    apiPost<any>(`/questions/${id}/answers`, { content: payload.text, authorName: payload.authorName }),
+    apiPost<any>(`/questions/${id}/answers`, { content: payload.text, authorName: payload.authorName, attachmentUrls: payload.attachments || [] }),
   update: (id: string, payload: { title?: string; description?: string; attachments?: string[] }) =>
-    apiPut<_BQuestion>(`/questions/${id}`, { title: payload.title, body: payload.description }).then(_mapQuestion),
+    apiPut<_BQuestion>(`/questions/${id}`, { title: payload.title, body: payload.description, attachmentUrls: payload.attachments }).then(_mapQuestion),
   remove: (id: string) => apiDelete<{ ok: true }>(`/questions/${id}`),
   removeAnswer: (id: string, answerId: string) => apiDelete<{ ok: true }>(`/questions/${id}/answers/${answerId}`),
   updateAnswer: (id: string, answerId: string, payload: { text?: string; attachments?: string[] }) =>
-    apiPut<any>(`/questions/${id}/answers/${answerId}`, { content: payload.text }),
+    apiPut<any>(`/questions/${id}/answers/${answerId}`, { content: payload.text, attachmentUrls: payload.attachments }),
   pinAnswer: (id: string, answerId: string) =>
     apiPost<any>(`/questions/${id}/answers/${answerId}/accept`, {}),
   // Votes (toggle: sending same type again removes the vote)
@@ -280,11 +281,11 @@ export const questionsApi = {
   bookmarked: () => apiGet<_BQuestion[]>('/questions/bookmarked').then(list => list.map(_mapQuestion)),
   // Replies
   addReply: (id: string, answerId: string, payload: { repliedBy?: string; repliedById?: string; authorName?: string; text: string; attachments?: string[] }) =>
-    apiPost<any>(`/questions/${id}/answers/${answerId}/replies`, { content: payload.text, authorName: payload.authorName }),
+    apiPost<any>(`/questions/${id}/answers/${answerId}/replies`, { content: payload.text, authorName: payload.authorName, attachmentUrls: payload.attachments || [] }),
   removeReply: (id: string, answerId: string, replyId: string) =>
     apiDelete<{ ok: true }>(`/questions/${id}/answers/${answerId}/replies/${replyId}`),
   updateReply: (id: string, answerId: string, replyId: string, payload: { text?: string; attachments?: string[] }) =>
-    apiPut<any>(`/questions/${id}/answers/${answerId}/replies/${replyId}`, { content: payload.text }),
+    apiPut<any>(`/questions/${id}/answers/${answerId}/replies/${replyId}`, { content: payload.text, attachmentUrls: payload.attachments }),
 };
 
 // ─── Groups ──────────────────────────────────────────────────────────────────

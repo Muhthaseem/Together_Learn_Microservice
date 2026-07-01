@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { questionsApi, coursesApi, uploadApi } from "@/lib/api";
+import { questionsApi, coursesApi, filesApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -128,13 +128,13 @@ export default function QuestionsPage() {
     try {
       const mediaUrls: string[] = [];
       if (selectedFiles.length) {
-        const up = await uploadApi.upload(selectedFiles);
-        mediaUrls.push(...up.files.map(f => f.url));
+        const results = await Promise.all(selectedFiles.map(f => filesApi.upload(f)));
+        mediaUrls.push(...results.map(r => r.url));
       }
       if (audioBlob) {
         const file = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
-        const up = await uploadApi.upload([file]);
-        mediaUrls.push(...up.files.map(f => f.url));
+        const result = await filesApi.upload(file);
+        mediaUrls.push(result.url);
       }
       await questionsApi.create({
         userId: user.userId,

@@ -123,6 +123,12 @@ export default function NotificationsPage() {
           <Button onClick={markAll}>Mark all read</Button>
         </div>
       </div>
+      {filtered.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+          <p className="text-sm">{onlyUnread ? 'No unread notifications' : 'No notifications yet'}</p>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         {filtered.map((n) => {
           const href = linkFor(n);

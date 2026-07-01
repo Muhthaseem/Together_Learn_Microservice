@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { groupsApi, filesApi } from "@/lib/api";
+import { groupsApi, filesApi, apiGet } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/Button";
 import { PaperAirplaneIcon, PaperClipIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -15,15 +15,18 @@ type ChatMessage = {
   createdAt: string;
 };
 
+type WsStatus = "connecting" | "live" | "offline";
+
 const WS_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api").replace(/\/api$/, "");
 
 export function GroupChat({ groupId }: { groupId: string }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [connected, setConnected] = useState(false);
+  const [wsStatus, setWsStatus] = useState<WsStatus>("connecting");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [userNames, setUserNames] = useState<Record<string, string>>({});
   const clientRef = useRef<Client | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -38,15 +41,19 @@ export function GroupChat({ groupId }: { groupId: string }) {
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("tl_token") : null;
-    if (!token || !user) return;
+    if (!token || !user) {
+      setWsStatus("offline");
+      return;
+    }
 
+    setWsStatus("connecting");
     const sockUrl = `${WS_BASE}/ws/chat?token=${encodeURIComponent(token)}`;
 
     const client = new Client({
       webSocketFactory: () => new SockJS(sockUrl),
       reconnectDelay: 5000,
       onConnect: () => {
-        setConnected(true);
+        setWsStatus("live");
         client.subscribe(`/topic/group/${groupId}`, (frame) => {
           const msg = JSON.parse(frame.body) as {
             messageId: string;
@@ -67,8 +74,8 @@ export function GroupChat({ groupId }: { groupId: string }) {
           ]);
         });
       },
-      onDisconnect: () => setConnected(false),
-      onStompError: () => setConnected(false),
+      onDisconnect: () => setWsStatus("offline"),
+      onStompError: () => setWsStatus("offline"),
     });
 
     client.activate();
@@ -78,6 +85,21 @@ export function GroupChat({ groupId }: { groupId: string }) {
       client.deactivate();
     };
   }, [groupId, user]);
+
+  useEffect(() => {
+    const unknownIds = [...new Set(messages.map((m) => m.userId))].filter(
+      (id) => id && id !== user?.userId && !userNames[id]
+    );
+    if (!unknownIds.length) return;
+    unknownIds.forEach(async (id) => {
+      try {
+        const u = await apiGet<{ userId: string; name: string }>(`/users/${id}`);
+        if (u?.name) setUserNames((prev) => ({ ...prev, [id]: u.name }));
+      } catch {}
+    });
+  }, [messages]);
+
+  const connected = wsStatus === "live";
 
   const sendMessage = async () => {
     const text = input.trim();
@@ -123,10 +145,14 @@ export function GroupChat({ groupId }: { groupId: string }) {
         <span className="font-medium">Group Chat</span>
         <span
           className={`text-xs px-2 py-0.5 rounded-full ${
-            connected ? "bg-green-500/20 text-green-600" : "bg-surface-2 text-muted"
+            wsStatus === "live"
+              ? "bg-green-500/20 text-green-600"
+              : wsStatus === "connecting"
+              ? "bg-yellow-500/20 text-yellow-600"
+              : "bg-red-500/20 text-red-500"
           }`}
         >
-          {connected ? "Live" : "Connecting..."}
+          {wsStatus === "live" ? "Live" : wsStatus === "connecting" ? "Connecting..." : "Offline"}
         </span>
       </div>
 
@@ -146,7 +172,9 @@ export function GroupChat({ groupId }: { groupId: string }) {
                 }`}
               >
                 {!isOwn && (
-                  <div className="text-xs opacity-70 mb-1">{msg.userId.slice(0, 8)}</div>
+                  <div className="text-xs font-medium opacity-70 mb-1">
+                    {userNames[msg.userId] ?? msg.userId.slice(0, 8)}
+                  </div>
                 )}
                 {msg.text && msg.text !== "📎" && <div>{msg.text}</div>}
                 {msg.attachmentUrl && (
@@ -204,7 +232,13 @@ export function GroupChat({ groupId }: { groupId: string }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={connected ? "Type a message..." : "Connecting to chat..."}
+          placeholder={
+            wsStatus === "live"
+              ? "Type a message..."
+              : wsStatus === "connecting"
+              ? "Connecting to chat..."
+              : "Chat offline — reconnecting..."
+          }
           disabled={!connected || uploading}
           className="flex-1 h-10 rounded border border-token bg-surface px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] disabled:opacity-50"
         />
