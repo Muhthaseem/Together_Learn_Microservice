@@ -8,7 +8,7 @@ RUN mvn -B install -N -q
 # Pre-download this module's dependencies (cached layer if pom.xml unchanged)
 WORKDIR /workspace/discovery-server
 COPY discovery-server/pom.xml .
-RUN mvn -B dependency:resolve -q
+RUN mvn -B dependency:go-offline -q
 
 # Build
 COPY discovery-server/src ./src

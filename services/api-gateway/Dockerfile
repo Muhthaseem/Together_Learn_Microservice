@@ -6,7 +6,7 @@ RUN mvn -B install -N -q
 
 WORKDIR /workspace/api-gateway
 COPY api-gateway/pom.xml .
-RUN mvn -B dependency:resolve -q
+RUN mvn -B dependency:go-offline -q
 
 COPY api-gateway/src ./src
 RUN mvn -B package -DskipTests -q

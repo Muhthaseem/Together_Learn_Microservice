@@ -6,7 +6,7 @@ RUN mvn -B install -N -q
 
 WORKDIR /workspace/notification-service
 COPY notification-service/pom.xml .
-RUN mvn -B dependency:resolve -q
+RUN mvn -B dependency:go-offline -q
 
 COPY notification-service/src ./src
 RUN mvn -B package -DskipTests -q
