@@ -137,17 +137,17 @@ export const metaApi = {
 
 // ─── Q&A ─────────────────────────────────────────────────────────────────────
 
-type _BReply = { replyId: string; answerId: string; authorId: string; content: string; createdAt: string; updatedAt: string };
-type _BAnswer = { answerId: string; questionId: string; content: string; authorId: string; accepted: boolean; upvoteCount: number; userVote: 'UP' | 'DOWN' | null; attachmentUrls: string[]; replies: _BReply[]; createdAt: string; updatedAt: string };
-type _BQuestion = { questionId: string; title: string; body: string; authorId: string; courseCode: string; tags: string; status: string; answerCount: number; upvoteCount: number; userVote: 'UP' | 'DOWN' | null; bookmarked: boolean | null; attachmentUrls: string[]; createdAt: string; answers: _BAnswer[] };
+type _BReply = { replyId: string; answerId: string; authorId: string; authorName?: string; content: string; createdAt: string; updatedAt: string };
+type _BAnswer = { answerId: string; questionId: string; content: string; authorId: string; authorName?: string; accepted: boolean; upvoteCount: number; userVote: 'UP' | 'DOWN' | null; attachmentUrls: string[]; replies: _BReply[]; createdAt: string; updatedAt: string };
+type _BQuestion = { questionId: string; title: string; body: string; authorId: string; authorName?: string; courseCode: string; tags: string; status: string; answerCount: number; upvoteCount: number; userVote: 'UP' | 'DOWN' | null; bookmarked: boolean | null; attachmentUrls: string[]; createdAt: string; answers: _BAnswer[] };
 
 function _mapReply(r: _BReply) {
-  return { replyId: r.replyId, repliedBy: r.authorId, repliedById: r.authorId, text: r.content, date: r.createdAt, attachments: [] as string[] };
+  return { replyId: r.replyId, repliedBy: r.authorName || r.authorId, repliedById: r.authorId, text: r.content, date: r.createdAt, attachments: [] as string[] };
 }
 
 function _mapAnswer(a: _BAnswer) {
   return {
-    answerId: a.answerId, answeredBy: a.authorId, answeredById: a.authorId,
+    answerId: a.answerId, answeredBy: a.authorName || a.authorId, answeredById: a.authorId,
     text: a.content, attachments: (a.attachmentUrls || []) as string[],
     upvoteCount: a.upvoteCount ?? 0, userVote: a.userVote ?? null,
     date: a.createdAt, replies: (a.replies || []).map(_mapReply),
@@ -158,7 +158,7 @@ function _mapQuestion(q: _BQuestion): Question {
   return {
     questionId: q.questionId,
     userId: q.authorId,
-    userName: q.authorId,
+    userName: q.authorName || q.authorId,
     department: '',
     batch: '',
     courseModule: q.courseCode,
@@ -198,24 +198,69 @@ export type Question = {
   pinnedAnswerIds?: string[];
 };
 
+// User name/avatar cache keyed by userId
+const _userCache: Record<string, { name: string; avatarUrl?: string }> = {};
+
+async function _prefetchUsers(ids: string[]): Promise<void> {
+  const uncached = [...new Set(ids)].filter(Boolean).filter(id => !_userCache[id]);
+  if (!uncached.length) return;
+  await Promise.allSettled(uncached.map(async id => {
+    try {
+      const u = await apiGet<{ userId: string; name: string; avatarUrl?: string }>(`/users/${id}`);
+      if (u?.name) _userCache[id] = { name: u.name, avatarUrl: u.avatarUrl };
+    } catch {}
+  }));
+}
+
+function _applyUserNames(questions: Question[]): Question[] {
+  return questions.map(q => ({
+    ...q,
+    userName: _userCache[q.userId]?.name || q.userName,
+    userAvatarUrl: _userCache[q.userId]?.avatarUrl,
+    answers: q.answers.map(a => ({
+      ...a,
+      answeredBy: _userCache[a.answeredBy]?.name || a.answeredBy,
+      answeredByAvatarUrl: _userCache[a.answeredBy]?.avatarUrl,
+      replies: (a.replies || []).map(r => ({
+        ...r,
+        repliedBy: _userCache[r.repliedBy]?.name || r.repliedBy,
+        repliedByAvatarUrl: _userCache[r.repliedBy]?.avatarUrl,
+      })),
+    })),
+  }));
+}
+
 export const questionsApi = {
   list: async (params?: { courseModule?: string; q?: string; page?: number; limit?: number; sort?: string }) => {
     const qs = new URLSearchParams();
     if (params?.courseModule) qs.set('courseCode', params.courseModule);
     const suffix = qs.toString() ? `?${qs.toString()}` : '';
     const list = await apiGet<_BQuestion[]>(`/questions${suffix}`);
-    return { items: list.map(_mapQuestion), page: 1, limit: list.length, total: list.length, pages: 1 };
+    const mapped = list.map(_mapQuestion);
+    await _prefetchUsers(mapped.map(q => q.userId));
+    return { items: _applyUserNames(mapped), page: 1, limit: mapped.length, total: mapped.length, pages: 1 };
   },
-  get: (id: string) => apiGet<_BQuestion>(`/questions/${id}`).then(_mapQuestion),
+  get: async (id: string) => {
+    const q = await apiGet<_BQuestion>(`/questions/${id}`);
+    const mapped = _mapQuestion(q);
+    const ids = [
+      mapped.userId,
+      ...mapped.answers.map(a => a.answeredBy),
+      ...mapped.answers.flatMap(a => (a.replies || []).map(r => r.repliedBy)),
+    ];
+    await _prefetchUsers(ids);
+    return _applyUserNames([mapped])[0];
+  },
   create: (payload: Omit<Question, 'questionId' | 'answers' | 'date'> & { attachments?: string[] }) =>
     apiPost<_BQuestion>('/questions', {
       title: payload.title,
       body: payload.description,
       courseCode: payload.courseModule,
+      authorName: payload.userName,
       tags: '',
     }).then(_mapQuestion),
-  addAnswer: (id: string, payload: { answeredBy?: string; answeredById?: string; text: string; attachments?: string[] }) =>
-    apiPost<any>(`/questions/${id}/answers`, { content: payload.text }),
+  addAnswer: (id: string, payload: { answeredBy?: string; answeredById?: string; authorName?: string; text: string; attachments?: string[] }) =>
+    apiPost<any>(`/questions/${id}/answers`, { content: payload.text, authorName: payload.authorName }),
   update: (id: string, payload: { title?: string; description?: string; attachments?: string[] }) =>
     apiPut<_BQuestion>(`/questions/${id}`, { title: payload.title, body: payload.description }).then(_mapQuestion),
   remove: (id: string) => apiDelete<{ ok: true }>(`/questions/${id}`),
@@ -234,8 +279,8 @@ export const questionsApi = {
   removeBookmark: (id: string) => apiDelete<void>(`/questions/${id}/bookmark`),
   bookmarked: () => apiGet<_BQuestion[]>('/questions/bookmarked').then(list => list.map(_mapQuestion)),
   // Replies
-  addReply: (id: string, answerId: string, payload: { repliedBy?: string; repliedById?: string; text: string; attachments?: string[] }) =>
-    apiPost<any>(`/questions/${id}/answers/${answerId}/replies`, { content: payload.text }),
+  addReply: (id: string, answerId: string, payload: { repliedBy?: string; repliedById?: string; authorName?: string; text: string; attachments?: string[] }) =>
+    apiPost<any>(`/questions/${id}/answers/${answerId}/replies`, { content: payload.text, authorName: payload.authorName }),
   removeReply: (id: string, answerId: string, replyId: string) =>
     apiDelete<{ ok: true }>(`/questions/${id}/answers/${answerId}/replies/${replyId}`),
   updateReply: (id: string, answerId: string, replyId: string, payload: { text?: string; attachments?: string[] }) =>

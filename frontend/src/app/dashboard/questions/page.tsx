@@ -93,6 +93,13 @@ export default function QuestionsPage() {
 
   useEffect(() => {
     load();
+    const interval = setInterval(load, 15000);
+    const onVisible = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, courseModule, debouncedSearch, sort]);
 

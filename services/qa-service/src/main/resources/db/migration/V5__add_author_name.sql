@@ -1,0 +1,3 @@
+ALTER TABLE questions      ADD COLUMN IF NOT EXISTS author_name VARCHAR(255);
+ALTER TABLE answers        ADD COLUMN IF NOT EXISTS author_name VARCHAR(255);
+ALTER TABLE answer_replies ADD COLUMN IF NOT EXISTS author_name VARCHAR(255);

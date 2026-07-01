@@ -100,6 +100,13 @@ export default function QuestionDetailPage() {
   useEffect(() => {
     if (!id) return;
     load();
+    const interval = setInterval(load, 10000);
+    const onVisible = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -138,7 +145,7 @@ export default function QuestionDetailPage() {
         const up = await uploadApi.upload([file]);
         attachments.push(...up.files.map(f => f.url));
       }
-      await questionsApi.addAnswer(id, { answeredById: user.userId, text: values.text, attachments } as any);
+      await questionsApi.addAnswer(id, { answeredById: user.userId, authorName: user.name, text: values.text, attachments } as any);
       toast.success("Answer posted");
       reset({ text: "" });
       setFiles([]);
@@ -816,7 +823,7 @@ function ReplySection({ questionId, ownerUserId, answer, currentUserName, onRelo
         const up = await uploadApi.upload(rFiles);
         attachments.push(...up.files.map(f => f.url));
       }
-      await questionsApi.addReply(questionId, answer.answerId, { repliedById: user.userId, text: text.trim(), attachments } as any);
+      await questionsApi.addReply(questionId, answer.answerId, { repliedById: user.userId, authorName: user.name, text: text.trim(), attachments } as any);
       setText("");
       setRFiles([]);
       setOpen(false);

@@ -626,6 +626,23 @@ services:
     restart: unless-stopped
 
   # ──────────────────────────────────────────────────────────────────
+  # pgAdmin — PostgreSQL GUI
+  # UI: http://localhost:5050
+  # Login: admin@togetherlearn.com / admin
+  # ──────────────────────────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tl-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@togetherlearn.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - tl-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
   # Next.js Frontend
   # ──────────────────────────────────────────────────────────────────
   frontend:

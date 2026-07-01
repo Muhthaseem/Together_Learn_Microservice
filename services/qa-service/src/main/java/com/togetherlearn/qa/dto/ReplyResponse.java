@@ -15,6 +15,7 @@ public class ReplyResponse {
     private String replyId;
     private String answerId;
     private String authorId;
+    private String authorName;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

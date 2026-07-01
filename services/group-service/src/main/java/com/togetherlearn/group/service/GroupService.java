@@ -57,7 +57,7 @@ public class GroupService {
         List<StudyGroup> groups = courseCode != null
                 ? groupRepository.findByCourseCode(courseCode)
                 : groupRepository.findAll();
-        return groups.stream().map(g -> toResponse(g, false)).collect(Collectors.toList());
+        return groups.stream().map(g -> toResponse(g, true)).collect(Collectors.toList());
     }
 
     public GroupResponse getGroup(String groupId) {

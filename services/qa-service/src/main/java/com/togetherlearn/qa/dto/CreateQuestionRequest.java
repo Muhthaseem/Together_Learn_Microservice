@@ -15,6 +15,7 @@ public class CreateQuestionRequest {
     @NotBlank
     private String body;
 
+    private String authorName;
     private String courseCode;
     private String tags;
     private List<String> attachmentUrls = new ArrayList<>();

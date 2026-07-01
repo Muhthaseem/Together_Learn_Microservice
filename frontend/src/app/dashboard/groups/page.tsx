@@ -177,6 +177,13 @@ export default function GroupsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, filterCourse, search]);
 
+  // Auto-refresh group list so creator sees new members and updated counts
+  useEffect(() => {
+    const t = setInterval(() => { load(); }, 15000);
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, filterCourse, search]);
+
   async function load() {
     const list = await groupsApi
       .list({ page, limit: 5, sort: '-createdAt', q: search || undefined, courseModule: filterCourse || undefined })

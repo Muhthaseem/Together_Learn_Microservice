@@ -17,6 +17,7 @@ public class AnswerResponse {
     private String questionId;
     private String content;
     private String authorId;
+    private String authorName;
     private boolean accepted;
     private Integer upvoteCount;
     private List<String> attachmentUrls;

@@ -33,6 +33,9 @@ public class Answer {
     @Column(name = "author_id", nullable = false)
     private String authorId;
 
+    @Column(name = "author_name")
+    private String authorName;
+
     @Column(name = "is_accepted", nullable = false)
     @Builder.Default
     private boolean accepted = false;

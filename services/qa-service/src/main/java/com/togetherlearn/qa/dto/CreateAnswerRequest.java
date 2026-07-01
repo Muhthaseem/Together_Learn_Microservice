@@ -12,5 +12,6 @@ public class CreateAnswerRequest {
     @NotBlank
     private String content;
 
+    private String authorName;
     private List<String> attachmentUrls = new ArrayList<>();
 }

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TogetherLearn — VIVA Presentation Guide</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #1a1a2e;
+    background: #fff;
+  }
+
+  /* ── Cover Page ── */
+  .cover {
+    page-break-after: always;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
+    color: #fff;
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .cover .badge {
+    background: #e94560;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+  }
+  .cover h1 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+  .cover h2 {
+    font-size: 20px;
+    font-weight: 300;
+    color: #a8b2d8;
+    margin-bottom: 40px;
+  }
+  .cover .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 40px 0;
+    width: 600px;
+  }
+  .cover .meta-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .cover .meta-card .num {
+    font-size: 36px;
+    font-weight: 800;
+    color: #e94560;
+  }
+  .cover .meta-card .label {
+    font-size: 12px;
+    color: #a8b2d8;
+    margin-top: 4px;
+  }
+  .cover .tagline {
+    font-size: 14px;
+    color: #a8b2d8;
+    max-width: 500px;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 30px;
+  }
+
+  /* ── Page layout ── */
+  .page {
+    padding: 30px 40px;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* ── Section headings ── */
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e94560;
+  }
+  .step-number {
+    background: #e94560;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f3460;
+  }
+  .step-time {
+    margin-left: auto;
+    background: #f0f4ff;
+    color: #0f3460;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f3460;
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e94560;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f3460;
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Info cards ── */
+  .info-box {
+    background: #f0f4ff;
+    border-left: 4px solid #0f3460;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+  .info-box .label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #0f3460;
+    margin-bottom: 4px;
+  }
+
+  .say-box {
+    background: #fff8f0;
+    border-left: 4px solid #e94560;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+  .say-box .label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #e94560;
+    margin-bottom: 4px;
+  }
+  .say-box p { font-style: italic; color: #333; }
+
+  .tip-box {
+    background: #f0fff4;
+    border-left: 4px solid #00b894;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+  .tip-box .label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #00b894;
+    margin-bottom: 4px;
+  }
+
+  /* ── Code blocks ── */
+  pre {
+    background: #1a1a2e;
+    color: #a8f0c6;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    margin: 10px 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  code {
+    background: #f0f4ff;
+    color: #e94560;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 12px;
+  }
+  th {
+    background: #0f3460;
+    color: #fff;
+    font-weight: 600;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e8ecf4;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f7f9ff; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── Architecture diagram ── */
+  .diagram {
+    background: #1a1a2e;
+    color: #a8f0c6;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10px;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    white-space: pre;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  /* ── Bullet lists ── */
+  ul, ol { padding-left: 20px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  li strong { color: #0f3460; }
+
+  /* ── Tag chips ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .chip {
+    background: #f0f4ff;
+    border: 1px solid #c5d0f5;
+    color: #0f3460;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+  .chip.red { background: #fff0f3; border-color: #ffb3c1; color: #e94560; }
+  .chip.green { background: #f0fff4; border-color: #b3f5d1; color: #00b894; }
+
+  /* ── Page TOC ── */
+  .toc { page-break-after: always; padding: 40px; }
+  .toc h1 { font-size: 28px; color: #0f3460; margin-bottom: 24px; }
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px dotted #dde;
+    gap: 12px;
+  }
+  .toc-num { color: #e94560; font-weight: 700; font-size: 14px; min-width: 28px; }
+  .toc-title { font-size: 14px; color: #1a1a2e; flex: 1; }
+  .toc-time { color: #888; font-size: 12px; }
+
+  /* ── Two-column layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 12px; }
+    .cover { min-height: 100vh; }
+    .page { padding: 20px 30px; }
+    pre { font-size: 10px; }
+    .diagram { font-size: 9px; }
+    h2 { font-size: 18px; }
+    .step-title { font-size: 17px; }
+  }
+
+  @page {
+    margin: 0;
+    size: A4;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- COVER PAGE -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="badge">Distributed Systems VIVA</div>
+  <h1>TogetherLearn</h1>
+  <h2>System Architecture &amp; Presentation Guide</h2>
+
+  <div class="meta-grid">
+    <div class="meta-card">
+      <div class="num">27</div>
+      <div class="label">Docker Containers</div>
+    </div>
+    <div class="meta-card">
+      <div class="num">10</div>
+      <div class="label">Microservices</div>
+    </div>
+    <div class="meta-card">
+      <div class="num">7</div>
+      <div class="label">Isolated Databases</div>
+    </div>
+  </div>
+
+  <div class="tagline">
+    A collaborative learning platform for university students —
+    study groups, Q&amp;A forum, peer tutoring, real-time chat,
+    notifications, and file sharing.<br><br>
+    Built with Spring Boot 3.2.5 · Spring Cloud Gateway · Netflix Eureka ·
+    RabbitMQ · Redis · PostgreSQL · Next.js 14 · Kubernetes
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="toc">
+  <h1>Presentation Order &amp; Contents</h1>
+  <div class="toc-item"><span class="toc-num">1</span><span class="toc-title">Full System Architecture Overview</span><span class="toc-time"></span></div>
+  <div class="toc-item"><span class="toc-num">2</span><span class="toc-title">Show All 27 Containers Running</span><span class="toc-time">2 min</span></div>
+  <div class="toc-item"><span class="toc-num">3</span><span class="toc-title">Service Discovery — Netflix Eureka</span><span class="toc-time">3 min</span></div>
+  <div class="toc-item"><span class="toc-num">4</span><span class="toc-title">API Gateway — JWT, Rate Limiting, Circuit Breakers</span><span class="toc-time">4 min</span></div>
+  <div class="toc-item"><span class="toc-num">5</span><span class="toc-title">Database-per-Service Isolation</span><span class="toc-time">2 min</span></div>
+  <div class="toc-item"><span class="toc-num">6</span><span class="toc-title">Async Event-Driven Architecture — RabbitMQ</span><span class="toc-time">4 min</span></div>
+  <div class="toc-item"><span class="toc-num">7</span><span class="toc-title">Real-Time Chat — WebSocket + STOMP</span><span class="toc-time">2 min</span></div>
+  <div class="toc-item"><span class="toc-num">8</span><span class="toc-title">Distributed Tracing — Zipkin</span><span class="toc-time">3 min</span></div>
+  <div class="toc-item"><span class="toc-num">9</span><span class="toc-title">Metrics — Prometheus + Grafana</span><span class="toc-time">3 min</span></div>
+  <div class="toc-item"><span class="toc-num">10</span><span class="toc-title">Centralized Logging — ELK Stack</span><span class="toc-time">3 min</span></div>
+  <div class="toc-item"><span class="toc-num">11</span><span class="toc-title">File Storage — MinIO (S3)</span><span class="toc-time">2 min</span></div>
+  <div class="toc-item"><span class="toc-num">12</span><span class="toc-title">Kubernetes Production Deployment</span><span class="toc-time">2 min</span></div>
+  <div class="toc-item"><span class="toc-num">13</span><span class="toc-title">CI/CD Pipeline — GitHub Actions</span><span class="toc-time">1 min</span></div>
+  <div class="toc-item"><span class="toc-num">14</span><span class="toc-title">Tough VIVA Q&amp;A Cheat-Sheet</span><span class="toc-time"></span></div>
+  <div class="toc-item"><span class="toc-num">15</span><span class="toc-title">Quick Reference — All URLs &amp; Credentials</span><span class="toc-time"></span></div>
+
+  <br>
+  <div class="tip-box">
+    <div class="label">The Golden Rule</div>
+    <p><strong>Tell a story:</strong> "We built a collaborative learning platform. Here's how we made it distributed, resilient, observable, and scalable." Present in this order: <strong>Infrastructure → Discovery → Gateway → Services → Async Events → Real-time → Observability → Storage → Deployment.</strong></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- ARCHITECTURE OVERVIEW -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <h2>Full System Architecture</h2>
+
+  <div class="diagram">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           CLIENT LAYER                                        │
+│         Next.js 14 Frontend  (Port 3000)                                     │
+│         React 19 · TypeScript · Tailwind CSS · STOMP/SockJS WebSocket        │
+└─────────────────────────────────┬────────────────────────────────────────────┘
+                                  │  HTTP/REST + WebSocket
+                                  ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                      API GATEWAY  (Port 8080)                                 │
+│  Spring Cloud Gateway (Reactive WebFlux)                                     │
+│  ┌─────────────────────────────────────────────────────────────┐             │
+│  │ Filter Chain:                                                │             │
+│  │  JwtAuthFilter(-1) → RateLimitFilter(0) → LoggingFilter(1)  │             │
+│  │  + Per-route Resilience4j Circuit Breakers                  │             │
+│  └─────────────────────────────────────────────────────────────┘             │
+└─────────┬──────────────────────────────────────────────────────┬─────────────┘
+          │ lb://SERVICE-NAME (Eureka)                           │
+          ▼                                                       ▼
+┌─────────────────────┐                               ┌──────────────────────┐
+│ Discovery Server    │                               │  Redis  (Port 6379)  │
+│ Netflix Eureka:8761 │                               │  JWT blacklist       │
+│ All 10 services     │                               │  Profile cache 10min │
+│ self-register       │                               │  Course cache 24hr   │
+└─────────────────────┘                               │  Rate-limit counters │
+                                                      │  Unread notif count  │
+                                                      └──────────────────────┘
+
+┌──────────┬──────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+│user :8081│course:8082│group:8083│qa   :8084│peer :8085│notif:8086│chat :8087│
+│Auth, JWT │Catalog   │Study grp │Questions │Tutoring  │RabbitMQ  │WebSocket │
+│Profiles  │Redis 24h │Membership│Answers   │Sessions  │Consumer  │STOMP     │
+│RBAC      │Admin CRUD│Publishes │Votes     │Ratings   │Persists  │History   │
+│          │          │events    │Bookmarks │Publishes │Redis cnt │REST      │
+└────┬─────┴────┬─────┴────┬─────┴────┬─────┴────┬─────┴────┬─────┴────┬─────┘
+     │          │          │          │          │          │          │
+  pg-user   pg-course  pg-group   pg-qa    pg-peer  pg-notif  pg-chat
+
+             ┌──────────────────────┐    ┌──────────────────────┐
+             │  RabbitMQ  (5672)    │    │  File Service :8088  │
+             │  tl.events exchange  │    │  AWS SDK v2 + MinIO  │
+             │  tl.notifications Q  │    │  S3-compatible :9000 │
+             │  DLQ + 3x retry      │    │  Presigned URLs      │
+             └──────────────────────┘    └──────────────────────┘
+
+┌──────────┬──────────┬──────────┬──────────────────────────────────────────┐
+│ Zipkin   │Prometheus│ Grafana  │  ELK Stack                               │
+│ :9411    │ :9090    │ :3001    │  Elasticsearch:9200 Logstash:5044        │
+│ Traces   │ Metrics  │Dashboards│  Kibana:5601                             │
+│ 100%     │ 15s poll │ JVM+HTTP │  togetherlearn-{svc}-{date} index        │
+└──────────┴──────────┴──────────┴──────────────────────────────────────────┘</div>
+
+  <h3>All 10 Microservices at a Glance</h3>
+  <table>
+    <tr><th>Service</th><th>Port</th><th>Database</th><th>Responsibility</th></tr>
+    <tr><td><strong>discovery-server</strong></td><td>8761</td><td>—</td><td>Netflix Eureka registry — all services self-register</td></tr>
+    <tr><td><strong>api-gateway</strong></td><td>8080</td><td>—</td><td>JWT auth, rate limiting, circuit breakers, request logging</td></tr>
+    <tr><td><strong>user-service</strong></td><td>8081</td><td>user_db</td><td>Registration, login, JWT issuance, profiles, RBAC</td></tr>
+    <tr><td><strong>course-service</strong></td><td>8082</td><td>course_db</td><td>Course catalog (seeded from JSON), admin CRUD, Redis cache (24h)</td></tr>
+    <tr><td><strong>group-service</strong></td><td>8083</td><td>group_db</td><td>Study group creation, membership, publishes GROUP_JOIN events</td></tr>
+    <tr><td><strong>qa-service</strong></td><td>8084</td><td>qa_db</td><td>Questions, answers, upvotes, bookmarks, threaded replies</td></tr>
+    <tr><td><strong>peer-teaching-service</strong></td><td>8085</td><td>peer_db</td><td>Peer requests/offers, session scheduling, tutor ratings &amp; stats</td></tr>
+    <tr><td><strong>notification-service</strong></td><td>8086</td><td>notification_db</td><td>RabbitMQ consumer — persists in-app notifications, Redis unread count</td></tr>
+    <tr><td><strong>chat-service</strong></td><td>8087</td><td>chat_db</td><td>Group chat — WebSocket STOMP/SockJS + REST message history</td></tr>
+    <tr><td><strong>file-service</strong></td><td>8088</td><td>— (S3 only)</td><td>File upload/download via MinIO (S3-compatible), presigned URLs</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 1 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">1</div>
+    <div class="step-title">Show All 27 Containers Running</div>
+    <div class="step-time">~2 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">What to do</div>
+    Run this command in PowerShell to show all running project containers:
+  </div>
+  <pre>docker ps --format "table {{.Names}}\t{{.Status}}" --filter "name=tl-"</pre>
+
+  <div class="tip-box">
+    <div class="label">Expected Output</div>
+    You should see all 27 containers with <code>(healthy)</code> labels on databases, RabbitMQ, Redis, Zipkin, Elasticsearch, and MinIO.
+  </div>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"Our system runs as 27 Docker containers on a single bridge network called <code>tl-net</code>. You can see application services, 7 isolated databases, a message broker, cache, object storage, and a full observability stack — all containerized. The <em>(healthy)</em> labels confirm that health checks are wired up on critical infrastructure — Postgres waits for <code>pg_isready</code>, RabbitMQ waits for <code>rabbitmq-diagnostics ping</code> before any service is allowed to connect."</p>
+  </div>
+
+  <h3>Container Groups to Point Out</h3>
+  <div class="two-col">
+    <div>
+      <div class="chips">
+        <span class="chip">tl-gateway</span>
+        <span class="chip">tl-discovery</span>
+        <span class="chip">tl-user</span>
+        <span class="chip">tl-course</span>
+        <span class="chip">tl-group</span>
+        <span class="chip">tl-qa</span>
+        <span class="chip">tl-peer</span>
+        <span class="chip">tl-notification</span>
+        <span class="chip">tl-chat</span>
+        <span class="chip">tl-file</span>
+        <span class="chip">tl-frontend</span>
+      </div>
+      <p style="margin-top:8px; font-size:11px; color:#888;">Application Services (11)</p>
+    </div>
+    <div>
+      <div class="chips">
+        <span class="chip red">tl-pg-user</span>
+        <span class="chip red">tl-pg-course</span>
+        <span class="chip red">tl-pg-group</span>
+        <span class="chip red">tl-pg-qa</span>
+        <span class="chip red">tl-pg-peer</span>
+        <span class="chip red">tl-pg-notification</span>
+        <span class="chip red">tl-pg-chat</span>
+        <span class="chip red">tl-rabbitmq</span>
+        <span class="chip red">tl-redis</span>
+        <span class="chip red">tl-minio</span>
+      </div>
+      <p style="margin-top:8px; font-size:11px; color:#888;">Data + Infrastructure (10)</p>
+    </div>
+  </div>
+  <div class="chips">
+    <span class="chip green">tl-zipkin</span>
+    <span class="chip green">tl-prometheus</span>
+    <span class="chip green">tl-grafana</span>
+    <span class="chip green">tl-elasticsearch</span>
+    <span class="chip green">tl-logstash</span>
+    <span class="chip green">tl-kibana</span>
+    <span class="chip green">tl-pgadmin</span>
+  </div>
+  <p style="margin-top:8px; font-size:11px; color:#888;">Observability Stack (7)</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 2 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">2</div>
+    <div class="step-title">Service Discovery — Netflix Eureka</div>
+    <div class="step-time">~3 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URL to Open</div>
+    <strong>http://localhost:8761</strong> — Eureka Dashboard (no login required)
+  </div>
+
+  <h3>Step-by-Step Demo</h3>
+  <ol>
+    <li>Open <code>http://localhost:8761</code> in browser — show the Eureka dashboard</li>
+    <li>Point to <strong>"Instances currently registered with Eureka"</strong> — all 10 services listed</li>
+    <li>Show instance status: <strong>UP (1)</strong> for each service</li>
+    <li>Run terminal command alongside:
+      <pre>docker logs tl-discovery --tail 20</pre>
+      This shows heartbeat logs proving services actively check in
+    </li>
+    <li>REST endpoint to show it's a proper API:
+      <pre>curl -H "Accept: application/json" http://localhost:8761/eureka/apps</pre>
+    </li>
+  </ol>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"This is Netflix Eureka — our service registry. Every microservice registers itself on startup with its IP and port. The API Gateway never has a hardcoded URL — it resolves <code>lb://USER-SERVICE</code> dynamically from this registry at request time. If a service crashes and comes back up, it re-registers automatically. If we spin up 3 instances of user-service, Eureka load-balances across all three with Round-Robin. This is <strong>client-side service discovery</strong> — the caller (gateway) resolves the address, not a central load balancer."</p>
+  </div>
+
+  <div class="tip-box">
+    <div class="label">Key Point to Emphasize</div>
+    "No hardcoded IPs anywhere in our code. This is what makes horizontal scaling possible — spin up more instances and Eureka automatically includes them in routing."
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 3 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">3</div>
+    <div class="step-title">API Gateway — JWT Auth, Rate Limiting, Circuit Breakers</div>
+    <div class="step-time">~4 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">Gateway Entry Point</div>
+    All client traffic enters at <strong>http://localhost:8080</strong>
+  </div>
+
+  <h3>Demo 1 — Show JWT Validation (call without token)</h3>
+  <pre>curl http://localhost:8080/api/groups</pre>
+  <p>Expected: <code>401 Unauthorized</code> — gateway blocks unauthenticated access</p>
+
+  <h3>Demo 2 — Show with fake token</h3>
+  <pre>curl -H "Authorization: Bearer fakejwt.fake.fake" http://localhost:8080/api/groups</pre>
+  <p>Expected: <code>401 Unauthorized</code> — signature validation fails</p>
+
+  <h3>Demo 3 — Login and use real JWT</h3>
+  <pre># Login first
+$r = Invoke-RestMethod -Uri "http://localhost:8080/api/auth/login" `
+  -Method POST -ContentType "application/json" `
+  -Body '{"email":"your@email.com","password":"yourpassword"}'
+$token = $r.token
+
+# Authenticated call — works
+curl -H "Authorization: Bearer $token" http://localhost:8080/api/groups</pre>
+
+  <h3>Gateway Filter Chain</h3>
+  <table>
+    <tr><th>Filter</th><th>Order</th><th>What It Does</th></tr>
+    <tr><td><strong>JwtAuthFilter</strong></td><td>-1 (first)</td><td>Validates JWT signature. Checks Redis blacklist (<code>jwt:blacklist:{jti}</code>). Injects X-User-Id, X-User-Role headers. Skips /api/auth/** paths.</td></tr>
+    <tr><td><strong>RateLimitFilter</strong></td><td>0</td><td>Auth endpoints: 10 req/min/IP. Authenticated users: 300 req/min/userId. Anonymous: 30 req/min/IP. Uses Redis INCR + EXPIRE.</td></tr>
+    <tr><td><strong>LoggingFilter</strong></td><td>1 (last)</td><td>Logs method, path, userId, status code, and response duration.</td></tr>
+    <tr><td><strong>CircuitBreaker</strong></td><td>Per-route</td><td>Resilience4j: 10-call window, 50% failure → open 30s. Returns 503 JSON from FallbackController.</td></tr>
+  </table>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"The gateway validates the JWT, checks Redis to see if the token was revoked (logout blacklist), then strips the Authorization header and injects <code>X-User-Id</code>, <code>X-User-Role</code> as trusted HTTP headers. Downstream services read these headers directly — they never re-validate the token. This means zero cryptographic overhead on every service request. The circuit breaker prevents cascading failures — if user-service is degraded, the circuit opens and the gateway immediately returns 503 instead of queuing thousands of failing requests."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 4 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">4</div>
+    <div class="step-title">Database-per-Service Isolation</div>
+    <div class="step-time">~2 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URLs to Show</div>
+    <strong>pgAdmin:</strong> http://localhost:5050 — Login: admin@togetherlearn.com / admin
+  </div>
+
+  <h3>Show Isolated Databases</h3>
+  <pre>docker ps --format "table {{.Names}}\t{{.Status}}" --filter "name=tl-pg"</pre>
+
+  <table>
+    <tr><th>Container</th><th>Database</th><th>Owned By</th><th>Key Tables</th></tr>
+    <tr><td>tl-pg-user</td><td>user_db</td><td>user-service only</td><td>users, roles</td></tr>
+    <tr><td>tl-pg-course</td><td>course_db</td><td>course-service only</td><td>courses, metadata</td></tr>
+    <tr><td>tl-pg-group</td><td>group_db</td><td>group-service only</td><td>groups, participants</td></tr>
+    <tr><td>tl-pg-qa</td><td>qa_db</td><td>qa-service only</td><td>questions, answers, votes, bookmarks</td></tr>
+    <tr><td>tl-pg-peer</td><td>peer_db</td><td>peer-teaching-service only</td><td>requests, offers, sessions, ratings, stats</td></tr>
+    <tr><td>tl-pg-notification</td><td>notification_db</td><td>notification-service only</td><td>notifications</td></tr>
+    <tr><td>tl-pg-chat</td><td>chat_db</td><td>chat-service only</td><td>messages</td></tr>
+  </table>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"This is our most fundamental architectural decision: <strong>one database per service — no shared schemas, no cross-service JOINs</strong>. Group-service can only read from group_db. If we change the user table schema, it doesn't break any other service. Each service runs Flyway versioned migrations — V1, V2, V3, V4 — automatically on startup, with JPA in validate mode so Flyway owns all DDL. Cross-service data? Propagated asynchronously via RabbitMQ events — never via a shared database."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 5 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">5</div>
+    <div class="step-title">Async Event-Driven Architecture — RabbitMQ</div>
+    <div class="step-time">~4 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URLs to Show</div>
+    <strong>RabbitMQ Management UI:</strong> http://localhost:15672 — Login: tl / tl_password
+  </div>
+
+  <h3>What to Show in the UI</h3>
+  <ol>
+    <li><strong>Overview tab</strong> — live message rate graphs, connections</li>
+    <li><strong>Exchanges tab</strong> — show <code>tl.events</code> (topic type, durable)</li>
+    <li><strong>Queues tab</strong> — show <code>tl.notifications</code> and <code>tl.notifications.dlq</code></li>
+    <li>Run terminal command:
+      <pre>docker exec tl-rabbitmq rabbitmqctl list_queues name messages consumers</pre>
+    </li>
+  </ol>
+
+  <h3>Event Flow Architecture</h3>
+  <div class="diagram">
+[Group Service]  publishes "GROUP_JOIN"
+[Q&amp;A Service]   publishes "QUESTION_ANSWERED"
+[Peer Service]   publishes "SESSION_SCHEDULED"
+        ↓
+  rabbitTemplate.convertAndSend("tl.events", "notification.group", payload)
+        ↓
+  [tl.events topic exchange]  (durable)
+        ↓
+  Binding: routing key "notification.#"
+        ↓
+  [tl.notifications queue]  (durable, persistent messages)
+        ↓
+  [Notification Service @RabbitListener]
+  → Persist to notification_db
+  → INCR notif:unread:{recipientId} in Redis
+        ↓
+  [On failure after 3 retries, 3s backoff]
+        ↓
+  [tl.notifications.dlq]  (dead-letter queue for inspection)</div>
+
+  <h3>Event Types Published</h3>
+  <table>
+    <tr><th>Event</th><th>Publisher</th><th>Routing Key</th><th>Trigger</th></tr>
+    <tr><td>GROUP_JOIN</td><td>group-service</td><td>notification.group</td><td>User joins a study group</td></tr>
+    <tr><td>GROUP_CREATED</td><td>group-service</td><td>notification.group</td><td>New study group created</td></tr>
+    <tr><td>QUESTION_ANSWERED</td><td>qa-service</td><td>notification.qa</td><td>Answer posted to question</td></tr>
+    <tr><td>PEER_ACCEPTED</td><td>peer-service</td><td>notification.peer</td><td>Tutor application accepted</td></tr>
+    <tr><td>SESSION_SCHEDULED</td><td>peer-service</td><td>notification.peer</td><td>Tutoring session confirmed</td></tr>
+  </table>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"When a user joins a study group, the Group Service publishes an event to the <code>tl.events</code> topic exchange. It has <strong>no idea</strong> that a Notification Service exists — it just fires and forgets. If the Notification Service is down, RabbitMQ queues the messages — they deliver when it recovers. No notifications lost. That's <strong>temporal decoupling</strong>. We also have a dead-letter queue — after 3 retry attempts with 3-second backoff, failed messages go to the DLQ for manual inspection."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 6 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">6</div>
+    <div class="step-title">Real-Time Chat — WebSocket + STOMP</div>
+    <div class="step-time">~2 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URL to Open</div>
+    <strong>http://localhost:3000</strong> — Login, navigate to a Study Group, open Chat
+  </div>
+
+  <h3>Live Demo Steps</h3>
+  <ol>
+    <li>Open http://localhost:3000 in Chrome — log in as User A</li>
+    <li>Navigate to <strong>Study Groups</strong> → join or open a group → open <strong>Chat</strong></li>
+    <li>Open a second browser window (incognito) — log in as User B</li>
+    <li>Join the same group → open Chat</li>
+    <li>Send a message from User A — watch it appear instantly in User B's window</li>
+  </ol>
+
+  <h3>WebSocket Architecture</h3>
+  <div class="diagram">
+Browser (Next.js)
+  ↓
+WebSocket Upgrade: GET /ws/groups/{groupId}?token={jwt}
+  ↓ (NOTE: browsers cannot send Authorization headers on WS upgrade)
+API Gateway — JwtAuthFilter extracts &amp; validates ?token query param
+  ↓
+Chat Service (StompEndpointRegistry at /ws)
+  ↓
+@MessageMapping("/chat/{groupId}/send")
+  → Persist message to chat_db
+  → Broadcast to /topic/group/{groupId}
+  ↓
+All subscribers (open browser tabs) receive message instantly</div>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"Group chat uses <strong>WebSocket with STOMP over SockJS</strong>. When a user sends a message, it's persisted to <code>chat_db</code> and broadcast to all subscribers on <code>/topic/group/{groupId}</code>. There's a subtle distributed systems problem here: browsers <em>cannot</em> send custom HTTP headers during a WebSocket upgrade request. So instead of the standard <code>Authorization: Bearer</code> header, the JWT is passed as <code>?token=</code> in the query string. The gateway intercepts this and validates it identically to the header case. SockJS also provides an HTTP long-polling fallback if native WebSocket isn't available."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 7 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">7</div>
+    <div class="step-title">Distributed Tracing — Zipkin</div>
+    <div class="step-time">~3 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URL to Open</div>
+    <strong>http://localhost:9411</strong> — No login required
+  </div>
+
+  <h3>Step-by-Step Demo</h3>
+  <ol>
+    <li>Open Zipkin UI at <code>http://localhost:9411</code></li>
+    <li>Click <strong>"Run Query"</strong> — shows recent traces across all services</li>
+    <li>Click any trace — shows the <strong>waterfall diagram</strong> with parent-child spans</li>
+    <li>Find a login trace — shows: Gateway → User Service → Redis → PostgreSQL</li>
+    <li>Show the latency at each hop: how long JWT validation took, DB query time, etc.</li>
+    <li>Click <strong>"Dependencies"</strong> tab — shows service-to-service call graph</li>
+  </ol>
+
+  <h3>How Tracing Works</h3>
+  <div class="diagram">
+Client Request → API Gateway
+        ↓ Micrometer Brave creates root span with unique traceId
+        ↓ Propagates via: X-B3-TraceId, X-B3-SpanId headers
+Gateway → User Service (child span)
+        ↓ User Service → Redis (child span)
+        ↓ User Service → PostgreSQL (child span)
+        ↓ User Service → returns to Gateway
+All spans sent to Zipkin via HTTP: http://zipkin:9411/api/v2/spans
+
+Zipkin UI shows:
+  traceId: abc123def456
+  ├── Gateway               [0ms → 145ms]
+  │   └── User Service      [5ms → 140ms]
+  │       ├── Redis check   [5ms → 8ms]
+  │       └── DB query      [10ms → 95ms]</div>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"Every request across our 10 services gets a unique <code>traceId</code> that propagates through all hops via Micrometer Brave. We run 100% trace sampling in development. This trace shows a login request: the gateway received it, forwarded to user-service, user-service checked Redis for a cached profile, queried PostgreSQL, issued a JWT, and responded — all visible as parent-child spans with exact latencies. In a traditional monolith, debugging a slow request is easy. In microservices, <strong>without distributed tracing, you're completely blind to where time is spent</strong>."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 8 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">8</div>
+    <div class="step-title">Metrics — Prometheus + Grafana</div>
+    <div class="step-time">~3 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URLs to Open</div>
+    <strong>Grafana:</strong> http://localhost:3001 — Login: admin / admin<br>
+    <strong>Prometheus:</strong> http://localhost:9090
+  </div>
+
+  <h3>Grafana Demo Steps</h3>
+  <ol>
+    <li>Open <code>http://localhost:3001</code>, login with admin/admin</li>
+    <li>Go to <strong>Explore</strong> → select <strong>Prometheus</strong> as datasource</li>
+    <li>Run query: <pre>up</pre>Shows 1 = alive, 0 = down for every service</li>
+    <li>Run query: <pre>jvm_memory_used_bytes</pre>Shows live JVM heap per service</li>
+    <li>Run query: <pre>http_server_requests_seconds_count</pre>Shows total HTTP requests per endpoint</li>
+  </ol>
+
+  <h3>What Prometheus Scrapes</h3>
+  <table>
+    <tr><th>Service Endpoint</th><th>Scrape Interval</th><th>Key Metrics</th></tr>
+    <tr><td>http://user-service:8081/actuator/prometheus</td><td>Every 15s</td><td>JVM heap, GC, threads, HTTP req count, response times</td></tr>
+    <tr><td>http://course-service:8082/actuator/prometheus</td><td>Every 15s</td><td>Same + Redis cache hit/miss rates</td></tr>
+    <tr><td>... (all 10 services)</td><td>Every 15s</td><td>JVM + HTTP + custom Micrometer metrics</td></tr>
+  </table>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"Prometheus scrapes <code>/actuator/prometheus</code> from all 10 services every 15 seconds. Every service exposes JVM metrics — heap usage, garbage collection, thread count — and HTTP metrics — request rate, error rate, response time percentiles. Grafana auto-provisions Prometheus as its datasource from our config files, so dashboards are ready immediately on startup without manual setup. For production Kubernetes, we'd add Grafana dashboard ID <strong>4701</strong> for JVM Micrometer and <strong>6756</strong> for Spring Boot statistics."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 9 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">9</div>
+    <div class="step-title">Centralized Logging — ELK Stack</div>
+    <div class="step-time">~3 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URL to Open</div>
+    <strong>Kibana:</strong> http://localhost:5601 — No login required in dev
+  </div>
+
+  <h3>First-Time Kibana Setup (do this before presenting)</h3>
+  <ol>
+    <li>Open <code>http://localhost:5601</code></li>
+    <li>Go to <strong>Management</strong> (gear icon) → <strong>Stack Management</strong></li>
+    <li>Click <strong>Index Patterns</strong> → <strong>Create index pattern</strong></li>
+    <li>Type <code>logstash-*</code> → select <code>@timestamp</code> as time field → Create</li>
+  </ol>
+
+  <h3>Kibana Demo Steps</h3>
+  <ol>
+    <li>Click <strong>Discover</strong> tab — shows live logs streaming from all services</li>
+    <li>Apply filter: <code>level: ERROR</code> — shows errors across all services in one view</li>
+    <li>Apply filter: <code>app: user-service</code> — isolates one service's logs</li>
+    <li>Run terminal backup:
+      <pre>curl http://localhost:9200/_cat/indices?v</pre>
+      Shows Elasticsearch indices (one per service per day)
+    </li>
+  </ol>
+
+  <h3>Log Flow</h3>
+  <div class="diagram">
+Each Spring Boot Service
+  Logstash Logback Encoder → structured JSON
+        ↓ TCP connection to port 5044
+Logstash container
+  TCP input → Elasticsearch output
+        ↓
+Elasticsearch
+  Index: togetherlearn-{app}-{YYYY.MM.dd}
+  Example: togetherlearn-user-service-2026.06.30
+        ↓
+Kibana
+  Discover: search ALL services' logs in one query
+  Filter by: service, userId, HTTP status, log level</div>
+
+  <h3>Sample Log Entry (Structured JSON)</h3>
+  <pre>{"@timestamp":"2026-06-30T12:34:56Z", "level":"INFO", "app":"user-service",
+"message":"User logged in", "userId":"550e8400-...", "method":"POST",
+"path":"/api/auth/login", "status":200, "duration_ms":145}</pre>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"Every service uses the Logstash Logback Encoder to emit structured JSON logs over TCP to Logstash on port 5044. Logstash forwards to Elasticsearch, indexed as <code>togetherlearn-{service}-{date}</code>. Instead of SSH-ing into individual containers and running <code>docker logs</code>, we can search <strong>all 10 services' logs in one query</strong> — filter by service, by userId, by HTTP status, by error level. In production Kubernetes with hundreds of replicas, this scales to billions of log entries."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 10 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">10</div>
+    <div class="step-title">File Storage — MinIO (S3-Compatible)</div>
+    <div class="step-time">~2 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">URL to Open</div>
+    <strong>MinIO Console:</strong> http://localhost:9001 — Login: minio / minio_pass
+  </div>
+
+  <h3>Demo Steps</h3>
+  <ol>
+    <li>Open <code>http://localhost:9001</code>, login with minio/minio_pass</li>
+    <li><strong>Object Browser</strong> → show <code>tl-files</code> bucket → show uploaded files</li>
+    <li><strong>Monitoring tab</strong> → shows uptime, storage used, request rates</li>
+    <li>Terminal health check:
+      <pre>curl http://localhost:9000/minio/health/live</pre>
+    </li>
+  </ol>
+
+  <h3>File Upload Flow</h3>
+  <div class="diagram">
+Client uploads file
+  → POST /api/files/upload (multipart/form-data)
+  → API Gateway validates JWT
+  → file-service (port 8088)
+  → AWS SDK v2: putObject to MinIO bucket "tl-files"
+  → Returns: file URL / presigned URL
+
+Client downloads file
+  → GET /api/files/{fileId}
+  → file-service generates presigned URL (expires in N minutes)
+  → Browser downloads DIRECTLY from MinIO (bypasses all services)</div>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"MinIO is our S3-compatible object storage. The file-service uses the standard <strong>AWS SDK v2</strong> to upload files and generate presigned URLs — the browser then downloads directly from MinIO, bypassing our backend entirely. The critical benefit: <strong>switching to real AWS S3 in production is just a config change</strong> — same SDK, same API, just change the endpoint URL and credentials. That's the power of programming against a standard interface."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 11 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">11</div>
+    <div class="step-title">Kubernetes — Production Deployment</div>
+    <div class="step-time">~2 minutes</div>
+  </div>
+
+  <div class="info-box">
+    <div class="label">What to Show</div>
+    Show the k8s/ folder structure — no live K8s cluster needed
+    <pre>ls d:/TogetherLearn_DisSysArch/TogetherLearn_DisSysArch/k8s/</pre>
+  </div>
+
+  <h3>Kubernetes Manifest Structure</h3>
+  <table>
+    <tr><th>File/Folder</th><th>Purpose</th></tr>
+    <tr><td>namespace.yaml</td><td>Creates isolated <code>togetherlearn</code> namespace</td></tr>
+    <tr><td>secrets/app-secrets.yaml</td><td>JWT secret, DB passwords, S3 credentials</td></tr>
+    <tr><td>configmaps/common-config.yaml</td><td>EUREKA_URI, ZIPKIN_URL, SPRING_PROFILES_ACTIVE</td></tr>
+    <tr><td>stateful/</td><td><strong>StatefulSets</strong>: PostgreSQL×7, RabbitMQ, Redis, MinIO (ordered startup, stable storage)</td></tr>
+    <tr><td>deployments/</td><td><strong>Deployments</strong>: 10 services + frontend (stateless, any order, horizontal scale)</td></tr>
+    <tr><td>hpa/hpa.yaml</td><td><strong>HPA</strong>: CPU 70% threshold → auto-scale 2–8 replicas per service</td></tr>
+    <tr><td>ingress/ingress.yaml</td><td>nginx: <code>app.*</code> → frontend, <code>api.*</code> → gateway</td></tr>
+    <tr><td>monitoring/monitoring.yaml</td><td>Zipkin, Prometheus, Grafana, ELK Deployments</td></tr>
+  </table>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"For production, stateful infrastructure — the 7 PostgreSQL databases, RabbitMQ, Redis, MinIO — runs as <strong>StatefulSets</strong> with PersistentVolumeClaims for stable storage and ordered startup. The 10 microservices and frontend run as <strong>Deployments</strong> — stateless, horizontally scalable. The HPA watches CPU: if any service hits 70% CPU utilization, it scales up to 8 replicas automatically. Eureka auto-discovers the new pods. The nginx Ingress routes <code>api.togetherlearn.app</code> to the gateway and <code>app.togetherlearn.app</code> to the frontend."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- STEP 12 -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="step-header">
+    <div class="step-number">12</div>
+    <div class="step-title">CI/CD Pipeline — GitHub Actions</div>
+    <div class="step-time">~1 minute</div>
+  </div>
+
+  <table>
+    <tr><th>Workflow</th><th>Trigger</th><th>Steps</th></tr>
+    <tr>
+      <td><strong>ci.yml</strong><br>PR Validation</td>
+      <td>Every pull request to main</td>
+      <td>
+        1. Parallel matrix build of all 10 services (Java 17 + Maven)<br>
+        2. Frontend type-check (Node 20 + <code>tsc --noEmit</code>)<br>
+        3. Any error blocks the PR merge
+      </td>
+    </tr>
+    <tr>
+      <td><strong>deploy.yml</strong><br>CD Pipeline</td>
+      <td>Merge to main</td>
+      <td>
+        1. Build all 10 services + frontend in parallel<br>
+        2. Push to Docker Hub: tagged with <code>{git-sha}</code> AND <code>latest</code><br>
+        3. <code>kubectl apply</code> all manifests (idempotent)<br>
+        4. Rolling update: <code>kubectl set image</code> with SHA tag<br>
+        5. Wait: <code>kubectl rollout status</code> (confirms zero-downtime)
+      </td>
+    </tr>
+  </table>
+
+  <div class="say-box">
+    <div class="label">What to say</div>
+    <p>"On every PR, all 10 services build in parallel using a GitHub Actions matrix — any compilation error blocks the merge. On merge to main, we build Docker images, push to Docker Hub with the <strong>git commit SHA as the image tag</strong> for full traceability and rollback capability, then do a rolling <code>kubectl set image</code> update with zero downtime. We wait for <code>kubectl rollout status</code> to confirm successful deployment before the pipeline completes."</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- VIVA Q&A -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <h2>Tough VIVA Q&amp;A — One-Line Answers</h2>
+
+  <table>
+    <tr><th>Question</th><th>Your Answer</th></tr>
+    <tr>
+      <td>"Why microservices over a monolith?"</td>
+      <td>Each domain deploys, scales, and fails independently. A bug in chat-service doesn't take down course-service. Different services can use different databases optimized for their needs.</td>
+    </tr>
+    <tr>
+      <td>"Why RabbitMQ instead of direct REST calls for notifications?"</td>
+      <td>Temporal decoupling — if notification-service is down, events queue and deliver when it recovers. No message is lost, and no producer has to wait. REST would require synchronous retries and tight coupling.</td>
+    </tr>
+    <tr>
+      <td>"How do you prevent cascading failures?"</td>
+      <td>Resilience4j circuit breakers at the gateway: 50% failure rate over 10 calls opens the circuit for 30 seconds and immediately returns 503 — stops queuing threads against a degraded upstream.</td>
+    </tr>
+    <tr>
+      <td>"How does logout work securely?"</td>
+      <td>The JWT's unique <code>jti</code> claim is written to Redis on logout with the token's remaining TTL. The gateway checks Redis on every request. When the TTL expires, the blacklist entry self-deletes.</td>
+    </tr>
+    <tr>
+      <td>"What if Redis goes down?"</td>
+      <td>Rate limiting and profile caching degrade gracefully (fallback to DB). The JWT blacklist check would be the concern — this would be handled by Redis Sentinel or Redis Cluster in production.</td>
+    </tr>
+    <tr>
+      <td>"How do services find each other?"</td>
+      <td>Client-side discovery via Netflix Eureka. The gateway resolves <code>lb://SERVICE-NAME</code> to a live IP at request time, not at startup. No hardcoded URLs anywhere.</td>
+    </tr>
+    <tr>
+      <td>"Isn't this a distributed monolith?"</td>
+      <td>No — each service has its own database, deploys via separate Docker image, and communicates only via REST API or events (never shared memory or shared DB). They can be deployed and scaled independently.</td>
+    </tr>
+    <tr>
+      <td>"How does WebSocket authentication work?"</td>
+      <td>Browsers can't send Authorization headers on WebSocket upgrades, so JWT is passed as <code>?token=</code> query param. The gateway's JwtAuthFilter handles both the header and query-param cases identically.</td>
+    </tr>
+    <tr>
+      <td>"What distributed patterns did you implement?"</td>
+      <td>API Gateway, Client-Side Service Discovery, Circuit Breaker, Database-per-Service, Async Event-Driven, Cache-Aside, Distributed Tracing, JWT Blacklist, Rate Limiting, HPA auto-scaling, Rolling Deployment.</td>
+    </tr>
+    <tr>
+      <td>"How do you handle a service that's slow, not down?"</td>
+      <td>The circuit breaker has a timeout (10s) — calls taking longer than 10s count as failures. Once 50% of the sliding window fails or times out, the circuit opens.</td>
+    </tr>
+    <tr>
+      <td>"What's the dead-letter queue for?"</td>
+      <td>After 3 retry attempts with 3-second backoff, a failed message goes to <code>tl.notifications.dlq</code> instead of being silently dropped. We can inspect and replay messages from the DLQ manually.</td>
+    </tr>
+    <tr>
+      <td>"How do you do zero-downtime deployment?"</td>
+      <td>Kubernetes rolling update: <code>kubectl set image</code> replaces pods one by one. The old pod serves traffic until the new one passes readiness probes. <code>kubectl rollout status</code> confirms completion before the pipeline marks success.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- QUICK REFERENCE -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="page">
+  <h2>Quick Reference — All URLs &amp; Credentials</h2>
+
+  <table>
+    <tr><th>Service</th><th>URL</th><th>Credentials</th><th>What to Show</th></tr>
+    <tr><td><strong>Frontend</strong></td><td>http://localhost:3000</td><td>Your registered account</td><td>Full application, live WebSocket chat</td></tr>
+    <tr><td><strong>API Gateway</strong></td><td>http://localhost:8080</td><td>—</td><td>curl commands (JWT validation)</td></tr>
+    <tr><td><strong>Eureka</strong></td><td>http://localhost:8761</td><td>—</td><td>All 10 services registered</td></tr>
+    <tr><td><strong>RabbitMQ UI</strong></td><td>http://localhost:15672</td><td>tl / tl_password</td><td>Queues, exchanges, message rates</td></tr>
+    <tr><td><strong>Zipkin</strong></td><td>http://localhost:9411</td><td>—</td><td>Traces, waterfall diagrams, dependencies</td></tr>
+    <tr><td><strong>Prometheus</strong></td><td>http://localhost:9090</td><td>—</td><td>Metric queries, scrape targets</td></tr>
+    <tr><td><strong>Grafana</strong></td><td>http://localhost:3001</td><td>admin / admin</td><td>Dashboards, JVM metrics, HTTP stats</td></tr>
+    <tr><td><strong>Kibana (ELK)</strong></td><td>http://localhost:5601</td><td>—</td><td>Log search, filter by service/level</td></tr>
+    <tr><td><strong>Elasticsearch</strong></td><td>http://localhost:9200</td><td>—</td><td>curl /_cat/indices?v (show log indices)</td></tr>
+    <tr><td><strong>MinIO Console</strong></td><td>http://localhost:9001</td><td>minio / minio_pass</td><td>tl-files bucket, uploaded objects</td></tr>
+    <tr><td><strong>pgAdmin</strong></td><td>http://localhost:5050</td><td>admin@togetherlearn.com / admin</td><td>7 isolated PostgreSQL databases</td></tr>
+  </table>
+
+  <h2 style="margin-top:24px;">Presentation Timing Summary</h2>
+  <table>
+    <tr><th>#</th><th>Step</th><th>Time</th><th>Tool</th></tr>
+    <tr><td>1</td><td>All 27 containers running</td><td>2 min</td><td>docker ps command</td></tr>
+    <tr><td>2</td><td>Eureka service discovery</td><td>3 min</td><td>localhost:8761</td></tr>
+    <tr><td>3</td><td>API Gateway: JWT + rate-limit + circuit breaker</td><td>4 min</td><td>curl commands</td></tr>
+    <tr><td>4</td><td>Database-per-service isolation</td><td>2 min</td><td>localhost:5050 (pgAdmin)</td></tr>
+    <tr><td>5</td><td>RabbitMQ async events + DLQ</td><td>4 min</td><td>localhost:15672</td></tr>
+    <tr><td>6</td><td>WebSocket real-time chat</td><td>2 min</td><td>localhost:3000 (two windows)</td></tr>
+    <tr><td>7</td><td>Zipkin distributed tracing</td><td>3 min</td><td>localhost:9411</td></tr>
+    <tr><td>8</td><td>Prometheus + Grafana metrics</td><td>3 min</td><td>localhost:3001</td></tr>
+    <tr><td>9</td><td>ELK centralized logging</td><td>3 min</td><td>localhost:5601</td></tr>
+    <tr><td>10</td><td>MinIO file storage</td><td>2 min</td><td>localhost:9001</td></tr>
+    <tr><td>11</td><td>Kubernetes manifests</td><td>2 min</td><td>k8s/ folder</td></tr>
+    <tr><td>12</td><td>CI/CD pipeline</td><td>1 min</td><td>GitHub Actions description</td></tr>
+    <tr style="background:#0f3460; color:#fff;"><td></td><td><strong>TOTAL</strong></td><td><strong>~31 minutes</strong></td><td></td></tr>
+  </table>
+
+  <div class="tip-box" style="margin-top:20px;">
+    <div class="label">Final Tip</div>
+    Open ALL browser tabs before the viva starts. Have the PowerShell terminal ready with docker ps output visible. Start with docker ps (shows scale), end with Kubernetes (shows production-readiness). The arc of the story: local dev (Docker Compose) → production (Kubernetes + CI/CD).
+  </div>
+</div>
+
+</body>
+</html>

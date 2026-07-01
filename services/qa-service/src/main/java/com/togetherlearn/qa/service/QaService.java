@@ -37,6 +37,7 @@ public class QaService {
                 .title(req.getTitle())
                 .body(req.getBody())
                 .authorId(authorId)
+                .authorName(req.getAuthorName())
                 .courseCode(req.getCourseCode())
                 .tags(req.getTags())
                 .attachmentUrls(req.getAttachmentUrls() != null ? req.getAttachmentUrls() : new java.util.ArrayList<>())
@@ -82,6 +83,7 @@ public class QaService {
                 .questionId(questionId)
                 .content(req.getContent())
                 .authorId(authorId)
+                .authorName(req.getAuthorName())
                 .attachmentUrls(req.getAttachmentUrls() != null ? req.getAttachmentUrls() : new java.util.ArrayList<>())
                 .build();
         Answer saved = answerRepository.save(answer);
@@ -205,6 +207,7 @@ public class QaService {
                 .replyId(UUID.randomUUID().toString())
                 .answerId(answerId)
                 .authorId(authorId)
+                .authorName(req.getAuthorName())
                 .content(req.getContent())
                 .build();
         return toReplyResponse(answerReplyRepository.save(reply));
@@ -264,6 +267,7 @@ public class QaService {
                 .title(q.getTitle())
                 .body(q.getBody())
                 .authorId(q.getAuthorId())
+                .authorName(q.getAuthorName())
                 .courseCode(q.getCourseCode())
                 .tags(q.getTags())
                 .status(q.getStatus())
@@ -293,6 +297,7 @@ public class QaService {
                 .questionId(a.getQuestionId())
                 .content(a.getContent())
                 .authorId(a.getAuthorId())
+                .authorName(a.getAuthorName())
                 .accepted(a.isAccepted())
                 .upvoteCount(a.getUpvoteCount())
                 .attachmentUrls(a.getAttachmentUrls())
@@ -308,6 +313,7 @@ public class QaService {
                 .replyId(r.getReplyId())
                 .answerId(r.getAnswerId())
                 .authorId(r.getAuthorId())
+                .authorName(r.getAuthorName())
                 .content(r.getContent())
                 .createdAt(r.getCreatedAt())
                 .updatedAt(r.getUpdatedAt())

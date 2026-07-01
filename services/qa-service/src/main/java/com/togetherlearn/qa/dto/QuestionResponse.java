@@ -17,6 +17,7 @@ public class QuestionResponse {
     private String title;
     private String body;
     private String authorId;
+    private String authorName;
     private String courseCode;
     private String tags;
     private String status;

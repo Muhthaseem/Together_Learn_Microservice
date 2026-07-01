@@ -44,7 +44,7 @@ export function NavBar() {
       } catch {/* ignore */}
     }
     load();
-    const t = setInterval(load, 30000);
+    const t = setInterval(load, 10000);
     return () => { mounted = false; clearInterval(t); };
   }, []);
 

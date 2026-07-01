@@ -28,6 +28,9 @@ public class AnswerReply {
     @Column(name = "author_id", nullable = false)
     private String authorId;
 
+    @Column(name = "author_name")
+    private String authorName;
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 

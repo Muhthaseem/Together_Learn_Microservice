@@ -33,6 +33,9 @@ public class Question {
     @Column(name = "author_id", nullable = false)
     private String authorId;
 
+    @Column(name = "author_name")
+    private String authorName;
+
     @Column(name = "course_code")
     private String courseCode;
 
