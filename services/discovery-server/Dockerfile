@@ -1,18 +1,28 @@
+# syntax=docker/dockerfile:1
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 WORKDIR /workspace
 
-# Install parent POM to local repo (non-recursive — no child modules compiled)
-COPY pom.xml .
-RUN mvn -B install -N -q
+ENV MAVEN_OPTS="-Daether.connector.http.retryHandler.count=5 -Daether.connector.http.connectionMaxTtl=120"
 
-# Pre-download this module's dependencies (cached layer if pom.xml unchanged)
+COPY pom.xml .
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B install -N -q || \
+    (sleep 20 && mvn -B install -N -q) || \
+    (sleep 60 && mvn -B install -N -q)
+
 WORKDIR /workspace/discovery-server
 COPY discovery-server/pom.xml .
+<<<<<<< Updated upstream
 RUN mvn -B dependency:resolve -q
+=======
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B dependency:go-offline -q || \
+    (sleep 20 && mvn -B dependency:go-offline -q) || \
+    (sleep 60 && mvn -B dependency:go-offline -q)
+>>>>>>> Stashed changes
 
-# Build
 COPY discovery-server/src ./src
-RUN mvn -B package -DskipTests -q
+RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests -q
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app

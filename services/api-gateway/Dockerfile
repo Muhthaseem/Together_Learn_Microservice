@@ -10,22 +10,18 @@ RUN --mount=type=cache,target=/root/.m2 \
     (sleep 20 && mvn -B install -N -q) || \
     (sleep 60 && mvn -B install -N -q)
 
-WORKDIR /workspace/group-service
-COPY group-service/pom.xml .
-<<<<<<< Updated upstream
-RUN mvn -B dependency:resolve -q
-=======
+WORKDIR /workspace/api-gateway
+COPY api-gateway/pom.xml .
 RUN --mount=type=cache,target=/root/.m2 \
     mvn -B dependency:go-offline -q || \
     (sleep 20 && mvn -B dependency:go-offline -q) || \
     (sleep 60 && mvn -B dependency:go-offline -q)
->>>>>>> Stashed changes
 
-COPY group-service/src ./src
+COPY api-gateway/src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests -q
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /workspace/group-service/target/*.jar app.jar
-EXPOSE 8083
+COPY --from=build /workspace/api-gateway/target/*.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

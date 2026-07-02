@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /workspace
 
 ENV MAVEN_OPTS="-Daether.connector.http.retryHandler.count=5 -Daether.connector.http.connectionMaxTtl=120"
@@ -10,22 +10,18 @@ RUN --mount=type=cache,target=/root/.m2 \
     (sleep 20 && mvn -B install -N -q) || \
     (sleep 60 && mvn -B install -N -q)
 
-WORKDIR /workspace/group-service
-COPY group-service/pom.xml .
-<<<<<<< Updated upstream
-RUN mvn -B dependency:resolve -q
-=======
+WORKDIR /workspace/chat-service
+COPY chat-service/pom.xml .
 RUN --mount=type=cache,target=/root/.m2 \
     mvn -B dependency:go-offline -q || \
     (sleep 20 && mvn -B dependency:go-offline -q) || \
     (sleep 60 && mvn -B dependency:go-offline -q)
->>>>>>> Stashed changes
 
-COPY group-service/src ./src
+COPY chat-service/src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn -B package -DskipTests -q
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /workspace/group-service/target/*.jar app.jar
-EXPOSE 8083
+COPY --from=build /workspace/chat-service/target/*.jar app.jar
+EXPOSE 8087
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,0 +1,663 @@
+# Shared secrets / URIs — referenced via YAML anchors
+x-jwt-secret: &jwt-secret "tl-jwt-secret-change-in-production-min-32-chars"
+x-eureka-uri: &eureka-uri "http://discovery-server:8761/eureka"
+x-db-password: &db-password "tl_postgres_pass"
+x-zipkin-url: &zipkin-url "http://zipkin:9411"
+
+# Reusable postgres healthcheck fragment
+x-pg-healthcheck: &pg-healthcheck
+  test: ["CMD-SHELL", "pg_isready -U postgres"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 10s
+
+networks:
+  tl-net:
+    driver: bridge
+
+volumes:
+  pg-user-data:
+  pg-course-data:
+  pg-group-data:
+  pg-qa-data:
+  pg-peer-data:
+  pg-notification-data:
+  pg-chat-data:
+  rabbitmq-data:
+  redis-data:
+  minio-data:
+  prometheus-data:
+  grafana-data:
+  es-data:
+
+services:
+
+  # ──────────────────────────────────────────────────────────────────
+  # Service Discovery
+  # ──────────────────────────────────────────────────────────────────
+  discovery-server:
+    build:
+      context: ./services
+      dockerfile: discovery-server/Dockerfile
+    container_name: tl-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 45s
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # PostgreSQL databases — one per data service
+  # ──────────────────────────────────────────────────────────────────
+  postgres-user:
+    image: postgres:16-alpine
+    container_name: tl-pg-user
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-user-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  postgres-course:
+    image: postgres:16-alpine
+    container_name: tl-pg-course
+    environment:
+      POSTGRES_DB: course_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-course-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  postgres-group:
+    image: postgres:16-alpine
+    container_name: tl-pg-group
+    environment:
+      POSTGRES_DB: group_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-group-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  postgres-qa:
+    image: postgres:16-alpine
+    container_name: tl-pg-qa
+    environment:
+      POSTGRES_DB: qa_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-qa-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  postgres-peer:
+    image: postgres:16-alpine
+    container_name: tl-pg-peer
+    environment:
+      POSTGRES_DB: peer_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-peer-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  postgres-notification:
+    image: postgres:16-alpine
+    container_name: tl-pg-notification
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-notification-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  postgres-chat:
+    image: postgres:16-alpine
+    container_name: tl-pg-chat
+    environment:
+      POSTGRES_DB: chat_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: *db-password
+    volumes:
+      - pg-chat-data:/var/lib/postgresql/data
+    networks:
+      - tl-net
+    healthcheck: *pg-healthcheck
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # RabbitMQ — async event bus for decoupled notifications
+  # Management UI: http://localhost:15672  (tl / tl_password)
+  # ──────────────────────────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: tl-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: tl
+      RABBITMQ_DEFAULT_PASS: tl_password
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - tl-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Redis — cache for user profiles, course catalog, unread counts
+  # ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: tl-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis_pass
+    volumes:
+      - redis-data:/data
+    networks:
+      - tl-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_pass", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Zipkin — distributed trace collector
+  # UI: http://localhost:9411
+  # ──────────────────────────────────────────────────────────────────
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: tl-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - tl-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9411/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Prometheus — metrics scraper
+  # UI: http://localhost:9090
+  # ──────────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: tl-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - tl-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Grafana — dashboards
+  # UI: http://localhost:3001  (admin / admin)
+  # ──────────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: tl-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - tl-net
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # API Gateway (single entry point for all clients)
+  # ──────────────────────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./services
+      dockerfile: api-gateway/Dockerfile
+    container_name: tl-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_URI: *eureka-uri
+      JWT_SECRET: *jwt-secret
+      REDIS_URL: redis://:redis_pass@redis:6379
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # User Service — auth, JWT issuance, profiles
+  # ──────────────────────────────────────────────────────────────────
+  user-service:
+    build:
+      context: ./services
+      dockerfile: user-service/Dockerfile
+    container_name: tl-user
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_URI: *eureka-uri
+      JWT_SECRET: *jwt-secret
+      DB_URL: jdbc:postgresql://postgres-user:5432/user_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      REDIS_URL: redis://:redis_pass@redis:6379
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-user:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Course Service — catalog + metadata
+  # ──────────────────────────────────────────────────────────────────
+  course-service:
+    build:
+      context: ./services
+      dockerfile: course-service/Dockerfile
+    container_name: tl-course
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_URI: *eureka-uri
+      DB_URL: jdbc:postgresql://postgres-course:5432/course_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      REDIS_URL: redis://:redis_pass@redis:6379
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-course:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Notification Service — must start before Group/Q&A/Peer
+  # ──────────────────────────────────────────────────────────────────
+  notification-service:
+    build:
+      context: ./services
+      dockerfile: notification-service/Dockerfile
+    container_name: tl-notification
+    ports:
+      - "8086:8086"
+    environment:
+      EUREKA_URI: *eureka-uri
+      DB_URL: jdbc:postgresql://postgres-notification:5432/notification_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      RABBITMQ_URI: amqp://tl:tl_password@rabbitmq:5672
+      REDIS_URL: redis://:redis_pass@redis:6379
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-notification:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Group Study Service
+  # ──────────────────────────────────────────────────────────────────
+  group-service:
+    build:
+      context: ./services
+      dockerfile: group-service/Dockerfile
+    container_name: tl-group
+    ports:
+      - "8083:8083"
+    environment:
+      EUREKA_URI: *eureka-uri
+      DB_URL: jdbc:postgresql://postgres-group:5432/group_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      RABBITMQ_URI: amqp://tl:tl_password@rabbitmq:5672
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-group:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Q&A Service
+  # ──────────────────────────────────────────────────────────────────
+  qa-service:
+    build:
+      context: ./services
+      dockerfile: qa-service/Dockerfile
+    container_name: tl-qa
+    ports:
+      - "8084:8084"
+    environment:
+      EUREKA_URI: *eureka-uri
+      DB_URL: jdbc:postgresql://postgres-qa:5432/qa_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      RABBITMQ_URI: amqp://tl:tl_password@rabbitmq:5672
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-qa:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Peer Teaching Service
+  # ──────────────────────────────────────────────────────────────────
+  peer-teaching-service:
+    build:
+      context: ./services
+      dockerfile: peer-teaching-service/Dockerfile
+    container_name: tl-peer
+    ports:
+      - "8085:8085"
+    environment:
+      EUREKA_URI: *eureka-uri
+      DB_URL: jdbc:postgresql://postgres-peer:5432/peer_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      RABBITMQ_URI: amqp://tl:tl_password@rabbitmq:5672
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-peer:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Chat Service
+  # ──────────────────────────────────────────────────────────────────
+  chat-service:
+    build:
+      context: ./services
+      dockerfile: chat-service/Dockerfile
+    container_name: tl-chat
+    ports:
+      - "8087:8087"
+    environment:
+      EUREKA_URI: *eureka-uri
+      DB_URL: jdbc:postgresql://postgres-chat:5432/chat_db
+      DB_USER: postgres
+      DB_PASSWORD: *db-password
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres-chat:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # MinIO — S3-compatible object storage (local dev)
+  # ──────────────────────────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: tl-minio
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web console (http://localhost:9001)
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio_pass
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - tl-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ──────────────────────────────────────────────────────────────────
+  # File Service — upload/download via S3 / MinIO
+  # ──────────────────────────────────────────────────────────────────
+  file-service:
+    build:
+      context: ./services
+      dockerfile: file-service/Dockerfile
+    container_name: tl-file
+    ports:
+      - "8088:8088"
+    environment:
+      EUREKA_URI: *eureka-uri
+      # Internal endpoint (Docker network) for API calls
+      AWS_S3_ENDPOINT: http://minio:9000
+      # Public endpoint so browsers can reach presigned/direct URLs
+      AWS_S3_PUBLIC_URL: http://localhost:9000
+      AWS_ACCESS_KEY: minio
+      AWS_SECRET_KEY: minio_pass
+      AWS_S3_BUCKET: tl-files
+      AWS_REGION: us-east-1
+      ZIPKIN_URL: *zipkin-url
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tl-net
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      zipkin:
+        condition: service_healthy
+    restart: on-failure
+
+  # ──────────────────────────────────────────────────────────────────
+  # Elasticsearch — log store for ELK stack
+  # API: http://localhost:9200
+  # ──────────────────────────────────────────────────────────────────
+  elasticsearch:
+    image: elasticsearch:8.13.0
+    container_name: tl-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - tl-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Logstash — receives JSON logs from services via TCP 5044
+  # ──────────────────────────────────────────────────────────────────
+  logstash:
+    image: logstash:8.13.0
+    container_name: tl-logstash
+    volumes:
+      - ./monitoring/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5044:5044"
+    environment:
+      LS_JAVA_OPTS: "-Xms256m -Xmx256m"
+    networks:
+      - tl-net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Kibana — log visualisation UI
+  # UI: http://localhost:5601
+  # ──────────────────────────────────────────────────────────────────
+  kibana:
+    image: kibana:8.13.0
+    container_name: tl-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - tl-net
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # pgAdmin — PostgreSQL GUI
+  # UI: http://localhost:5050
+  # Login: admin@togetherlearn.com / admin
+  # ──────────────────────────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tl-pgadmin
+    profiles: ["tools"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@togetherlearn.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - tl-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────
+  # Next.js Frontend
+  # ──────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Browser calls the gateway via the HOST's localhost, not Docker network
+        NEXT_PUBLIC_API_URL: http://localhost:8080/api
+    container_name: tl-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - tl-net
+    depends_on:
+      - api-gateway
+    restart: on-failure
